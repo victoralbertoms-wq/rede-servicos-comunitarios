@@ -96,14 +96,18 @@ export async function createService(data, photoFile, userId) {
 }
 
 export async function getServices({ communityId, pageSize = 100, lastDoc = null, userId = null } = {}) {
-  let constraints = [orderBy('createdAt', 'desc'), limit(pageSize)]
-  if (communityId) constraints = [where('communityId', '==', communityId), ...constraints]
+  let constraints = [limit(pageSize)]
+  if (communityId) {
+    constraints = [where('communityId', '==', communityId), ...constraints]
+  } else {
+    constraints = [orderBy('createdAt', 'desc'), ...constraints]
+  }
   if (lastDoc) constraints = [...constraints, startAfter(lastDoc)]
   const q = query(collection(db, 'services'), ...constraints)
   const snap = await getDocs(q)
-  const docs = snap.docs
-    .map(d => ({ id: d.id, ...d.data() }))
-    .filter(d => d.status === 'approved' || (userId && d.userId === userId))
+  let docs = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+  docs = docs.filter(d => d.status === 'approved' || (userId && d.userId === userId))
+  docs.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0))
   return { docs, lastDoc: snap.docs[snap.docs.length - 1] }
 }
 
@@ -135,14 +139,18 @@ export async function createCompany(data, logoFile, photoFile, userId) {
 }
 
 export async function getCompanies({ communityId, pageSize = 100, lastDoc = null, userId = null } = {}) {
-  let constraints = [orderBy('createdAt', 'desc'), limit(pageSize)]
-  if (communityId) constraints = [where('communityId', '==', communityId), ...constraints]
+  let constraints = [limit(pageSize)]
+  if (communityId) {
+    constraints = [where('communityId', '==', communityId), ...constraints]
+  } else {
+    constraints = [orderBy('createdAt', 'desc'), ...constraints]
+  }
   if (lastDoc) constraints = [...constraints, startAfter(lastDoc)]
   const q = query(collection(db, 'companies'), ...constraints)
   const snap = await getDocs(q)
-  const docs = snap.docs
-    .map(d => ({ id: d.id, ...d.data() }))
-    .filter(d => d.status === 'approved' || (userId && d.userId === userId))
+  let docs = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+  docs = docs.filter(d => d.status === 'approved' || (userId && d.userId === userId))
+  docs.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0))
   return { docs, lastDoc: snap.docs[snap.docs.length - 1] }
 }
 
