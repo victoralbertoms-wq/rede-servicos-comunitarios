@@ -1,0 +1,45 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isImageFile() {
+      return request.resource.contentType.matches('image/.*');
+    }
+
+    function isSmallEnough() {
+      return request.resource.size < 5 * 1024 * 1024; // 5MB
+    }
+
+    // Avatares de usuário
+    match /users/{userId}/avatar/{fileName} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() &&
+        request.auth.uid == userId &&
+        isImageFile() &&
+        isSmallEnough();
+    }
+
+    // Imagens de comunidades
+    match /communities/{communityId}/{fileName} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && isImageFile() && isSmallEnough();
+    }
+
+    // Imagens de serviços
+    match /services/{serviceId}/{fileName} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && isImageFile() && isSmallEnough();
+    }
+
+    // Imagens de empresas
+    match /companies/{companyId}/{fileName} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && isImageFile() && isSmallEnough();
+    }
+  }
+}
