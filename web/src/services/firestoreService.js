@@ -29,16 +29,18 @@ export async function createCommunity(data, logoFile, photoFile) {
   return docRef.id
 }
 
-export async function getCommunities(pageSize = 20, lastDoc = null) {
+export async function getCommunities(pageSize = 100, lastDoc = null) {
   let q = query(
     collection(db, 'communities'),
-    where('isActive', '==', true),
     orderBy('createdAt', 'desc'),
     limit(pageSize),
   )
   if (lastDoc) q = query(q, startAfter(lastDoc))
   const snap = await getDocs(q)
-  return { docs: snap.docs.map(d => ({ id: d.id, ...d.data() })), lastDoc: snap.docs[snap.docs.length - 1] }
+  const docs = snap.docs
+    .map(d => ({ id: d.id, ...d.data() }))
+    .filter(d => d.isActive !== false)
+  return { docs, lastDoc: snap.docs[snap.docs.length - 1] }
 }
 
 export async function getCommunity(id) {
@@ -89,22 +91,15 @@ export async function createService(data, photoFile, userId) {
   return docRef.id
 }
 
-export async function getServices({ communityId, category, city, state, search, pageSize = 20, lastDoc = null } = {}) {
-  let constraints = [where('status', '==', 'approved'), orderBy('createdAt', 'desc'), limit(pageSize)]
+export async function getServices({ communityId, pageSize = 100, lastDoc = null } = {}) {
+  let constraints = [orderBy('createdAt', 'desc'), limit(pageSize)]
   if (communityId) constraints = [where('communityId', '==', communityId), ...constraints]
-  if (category) constraints = [where('category', '==', category), ...constraints]
   if (lastDoc) constraints = [...constraints, startAfter(lastDoc)]
   const q = query(collection(db, 'services'), ...constraints)
   const snap = await getDocs(q)
-  let docs = snap.docs.map(d => ({ id: d.id, ...d.data() }))
-  if (search) {
-    const s = search.toLowerCase()
-    docs = docs.filter(d =>
-      d.name?.toLowerCase().includes(s) ||
-      d.category?.toLowerCase().includes(s) ||
-      d.specialty?.toLowerCase().includes(s)
-    )
-  }
+  const docs = snap.docs
+    .map(d => ({ id: d.id, ...d.data() }))
+    .filter(d => d.status === 'approved')
   return { docs, lastDoc: snap.docs[snap.docs.length - 1] }
 }
 
@@ -135,18 +130,15 @@ export async function createCompany(data, logoFile, photoFile, userId) {
   return docRef.id
 }
 
-export async function getCompanies({ communityId, category, pageSize = 20, lastDoc = null, search } = {}) {
-  let constraints = [where('status', '==', 'approved'), orderBy('createdAt', 'desc'), limit(pageSize)]
+export async function getCompanies({ communityId, pageSize = 100, lastDoc = null } = {}) {
+  let constraints = [orderBy('createdAt', 'desc'), limit(pageSize)]
   if (communityId) constraints = [where('communityId', '==', communityId), ...constraints]
-  if (category) constraints = [where('category', '==', category), ...constraints]
   if (lastDoc) constraints = [...constraints, startAfter(lastDoc)]
   const q = query(collection(db, 'companies'), ...constraints)
   const snap = await getDocs(q)
-  let docs = snap.docs.map(d => ({ id: d.id, ...d.data() }))
-  if (search) {
-    const s = search.toLowerCase()
-    docs = docs.filter(d => d.name?.toLowerCase().includes(s) || d.category?.toLowerCase().includes(s))
-  }
+  const docs = snap.docs
+    .map(d => ({ id: d.id, ...d.data() }))
+    .filter(d => d.status === 'approved')
   return { docs, lastDoc: snap.docs[snap.docs.length - 1] }
 }
 
