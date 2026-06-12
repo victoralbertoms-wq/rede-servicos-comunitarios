@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { getAdminStats, getPendingItems, updateService, updateDoc } from '../../services/firestoreService'
+import { getAdminStats, getPendingItems, updateService } from '../../services/firestoreService'
 import { doc } from 'firebase/firestore'
 import { db } from '../../firebase/config'
 import { updateDoc as fbUpdateDoc } from 'firebase/firestore'

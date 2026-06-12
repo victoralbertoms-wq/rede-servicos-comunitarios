@@ -83,7 +83,7 @@ export default function Sidebar({ onClose }) {
           </>
         )}
 
-        <div style={{ marginTop: 'auto', padding: '1rem .75rem', borderTop: '1px solid var(--border)', marginTop: '2rem' }}>
+        <div style={{ marginTop: 'auto', padding: '1rem .75rem', borderTop: '1px solid var(--border)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '.75rem', padding: '.5rem .5rem 1rem' }}>
             <div className="avatar avatar-sm avatar-placeholder" style={{ width: 36, height: 36, fontSize: 14 }}>
               {userProfile?.displayName?.[0]?.toUpperCase() || 'U'}
