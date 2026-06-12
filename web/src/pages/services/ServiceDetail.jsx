@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { getService, getReviews, addReview, toggleFavorite } from '../../services/firestoreService'
+import { getService, getReviews, addReview, toggleFavorite, deleteService } from '../../services/firestoreService'
 import { useAuth } from '../../contexts/AuthContext'
 import toast from 'react-hot-toast'
-import { HiStar, HiHeart, HiShare, HiChat, HiPhone, HiMail, HiGlobeAlt, HiLocationMarker, HiClock, HiPencil } from 'react-icons/hi'
+import { HiStar, HiHeart, HiShare, HiChat, HiPhone, HiMail, HiGlobeAlt, HiLocationMarker, HiClock, HiPencil, HiTrash } from 'react-icons/hi'
 import { SiWhatsapp } from 'react-icons/si'
 
 function Stars({ value, onChange }) {
@@ -50,6 +50,17 @@ export default function ServiceDetail() {
     const added = await toggleFavorite(user.uid, id, 'service')
     setIsFav(added)
     toast.success(added ? 'Adicionado aos favoritos!' : 'Removido dos favoritos.')
+  }
+
+  async function handleDelete() {
+    if (!window.confirm(`Excluir o serviço "${service.name}"? Esta ação não pode ser desfeita.`)) return
+    try {
+      await deleteService(id)
+      toast.success('Serviço excluído.')
+      navigate('/servicos')
+    } catch {
+      toast.error('Erro ao excluir serviço.')
+    }
   }
 
   async function submitReview() {
@@ -105,9 +116,14 @@ export default function ServiceDetail() {
               <HiShare size={20} />
             </button>
             {(isAdmin || service.userId === user?.uid) && (
-              <button className="btn btn-outline btn-sm" onClick={() => navigate(`/servicos/${id}/editar`)}>
-                <HiPencil /> Editar
-              </button>
+              <>
+                <button className="btn btn-outline btn-sm" onClick={() => navigate(`/servicos/${id}/editar`)}>
+                  <HiPencil /> Editar
+                </button>
+                <button className="btn btn-sm" style={{ background: 'var(--error)', color: '#fff' }} onClick={handleDelete}>
+                  <HiTrash /> Excluir
+                </button>
+              </>
             )}
             <button className="btn btn-primary btn-sm" onClick={() => navigate(`/mensagens?to=${service.userId}`)}>
               <HiChat /> Mensagem

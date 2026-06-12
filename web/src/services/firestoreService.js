@@ -52,6 +52,10 @@ export async function updateCommunity(id, data) {
   await updateDoc(doc(db, 'communities', id), { ...data, updatedAt: serverTimestamp() })
 }
 
+export async function deleteCommunity(id) {
+  await deleteDoc(doc(db, 'communities', id))
+}
+
 export async function joinCommunity(communityId, userId, password) {
   const community = await getCommunity(communityId)
   if (!community) throw new Error('Comunidade não encontrada')
@@ -149,6 +153,10 @@ export async function getCompany(id) {
 
 export async function updateCompany(id, data) {
   await updateDoc(doc(db, 'companies', id), { ...data, updatedAt: serverTimestamp() })
+}
+
+export async function deleteCompany(id) {
+  await deleteDoc(doc(db, 'companies', id))
 }
 
 // ── Reviews ────────────────────────────────────────────────────────────────────

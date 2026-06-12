@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { getCompany, getReviews, addReview, toggleFavorite } from '../../services/firestoreService'
+import { getCompany, getReviews, addReview, toggleFavorite, deleteCompany } from '../../services/firestoreService'
 import { useAuth } from '../../contexts/AuthContext'
 import toast from 'react-hot-toast'
-import { HiStar, HiHeart, HiShare, HiPhone, HiMail, HiGlobeAlt, HiLocationMarker, HiChat, HiPencil } from 'react-icons/hi'
+import { HiStar, HiHeart, HiShare, HiPhone, HiMail, HiGlobeAlt, HiLocationMarker, HiChat, HiPencil, HiTrash } from 'react-icons/hi'
 import { SiWhatsapp } from 'react-icons/si'
 
 function Stars({ value, onChange }) {
@@ -43,6 +43,17 @@ export default function CompanyDetail() {
     const added = await toggleFavorite(user.uid, id, 'company')
     setIsFav(added)
     toast.success(added ? 'Adicionado aos favoritos!' : 'Removido dos favoritos.')
+  }
+
+  async function handleDelete() {
+    if (!window.confirm(`Excluir a empresa "${company.name}"? Esta ação não pode ser desfeita.`)) return
+    try {
+      await deleteCompany(id)
+      toast.success('Empresa excluída.')
+      navigate('/empresas')
+    } catch {
+      toast.error('Erro ao excluir empresa.')
+    }
   }
 
   async function submitReview() {
@@ -88,9 +99,14 @@ export default function CompanyDetail() {
             <button className="btn-icon" onClick={handleFavorite}><HiHeart size={20} style={{ color: isFav ? 'var(--error)' : undefined }} /></button>
             <button className="btn-icon" onClick={() => { navigator.clipboard.writeText(window.location.href); toast.success('Link copiado!') }}><HiShare size={20} /></button>
             {(isAdmin || company.userId === user?.uid) && (
-              <button className="btn btn-outline btn-sm" onClick={() => navigate(`/empresas/${id}/editar`)}>
-                <HiPencil /> Editar
-              </button>
+              <>
+                <button className="btn btn-outline btn-sm" onClick={() => navigate(`/empresas/${id}/editar`)}>
+                  <HiPencil /> Editar
+                </button>
+                <button className="btn btn-sm" style={{ background: 'var(--error)', color: '#fff' }} onClick={handleDelete}>
+                  <HiTrash /> Excluir
+                </button>
+              </>
             )}
             <button className="btn btn-primary btn-sm" onClick={() => navigate(`/mensagens?to=${company.userId}`)}><HiChat /> Mensagem</button>
           </div>

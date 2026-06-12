@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react'
-import { useParams, Link } from 'react-router-dom'
-import { getCommunity, getServices, getCompanies } from '../../services/firestoreService'
+import { useParams, Link, useNavigate } from 'react-router-dom'
+import { getCommunity, getServices, getCompanies, deleteCommunity } from '../../services/firestoreService'
 import { useAuth } from '../../contexts/AuthContext'
-import { HiUserGroup, HiBriefcase, HiOfficeBuilding, HiPencil } from 'react-icons/hi'
+import toast from 'react-hot-toast'
+import { HiUserGroup, HiBriefcase, HiOfficeBuilding, HiPencil, HiTrash } from 'react-icons/hi'
 
 export default function CommunityDetail() {
   const { id } = useParams()
   const { isAdmin } = useAuth()
+  const navigate = useNavigate()
   const [community, setCommunity] = useState(null)
   const [services, setServices] = useState([])
   const [companies, setCompanies] = useState([])
@@ -24,6 +26,17 @@ export default function CommunityDetail() {
       setCompanies(co.docs)
     }).finally(() => setLoading(false))
   }, [id])
+
+  async function handleDelete() {
+    if (!window.confirm(`Excluir a comunidade "${community.name}"? Esta ação não pode ser desfeita.`)) return
+    try {
+      await deleteCommunity(id)
+      toast.success('Comunidade excluída.')
+      navigate('/comunidades')
+    } catch {
+      toast.error('Erro ao excluir comunidade.')
+    }
+  }
 
   if (loading) return <div style={{ display: 'flex', justifyContent: 'center', padding: '3rem' }}><div className="spinner" /></div>
   if (!community) return <div className="empty-state"><h3>Comunidade não encontrada</h3></div>
@@ -62,9 +75,14 @@ export default function CommunityDetail() {
       {/* Add buttons */}
       <div style={{ display: 'flex', gap: '.75rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
         {isAdmin && (
-          <Link to={`/comunidades/${id}/editar`} className="btn btn-outline btn-sm">
-            <HiPencil /> Editar Comunidade
-          </Link>
+          <>
+            <Link to={`/comunidades/${id}/editar`} className="btn btn-outline btn-sm">
+              <HiPencil /> Editar
+            </Link>
+            <button className="btn btn-sm" style={{ background: 'var(--error)', color: '#fff' }} onClick={handleDelete}>
+              <HiTrash /> Excluir
+            </button>
+          </>
         )}
       </div>
       <div style={{ display: 'flex', gap: '.75rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
