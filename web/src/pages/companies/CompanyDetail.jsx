@@ -83,7 +83,7 @@ export default function CompanyDetail() {
       </div>
 
       <div className="card" style={{ padding: '1.75rem', marginBottom: '1.5rem' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
           <div>
             <span className="badge badge-info" style={{ marginBottom: '.5rem' }}>{company.category}</span>
             <h1 style={{ fontSize: '1.6rem', fontWeight: 800 }}>{company.name}</h1>
@@ -114,7 +114,7 @@ export default function CompanyDetail() {
 
         {company.description && <p style={{ marginTop: '1.25rem', color: 'var(--text-muted)', lineHeight: 1.7 }}>{company.description}</p>}
 
-        <div style={{ marginTop: '1.5rem', display: 'flex', flexWrap: 'wrap', gap: '.75rem' }}>
+        <div style={{ marginTop: '1.5rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px,1fr))', gap: '.75rem' }}>
           {company.phone && <a href={`tel:${company.phone}`} className="btn btn-secondary btn-sm" style={{ textDecoration: 'none' }}><HiPhone /> {company.phone}</a>}
           {whatsUrl && <a href={whatsUrl} target="_blank" rel="noopener noreferrer" className="btn btn-sm" style={{ background: '#25d366', color: '#fff', textDecoration: 'none' }}><SiWhatsapp /> WhatsApp</a>}
           {company.email && <a href={`mailto:${company.email}`} className="btn btn-secondary btn-sm" style={{ textDecoration: 'none' }}><HiMail /> E-mail</a>}
