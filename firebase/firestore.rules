@@ -73,7 +73,11 @@ service cloud.firestore {
         isCommunityAdmin(resource.data.communityId) ||
         isGlobalAdmin()
       );
-      allow create: if isAuthenticated() && isCommunityMember(request.resource.data.communityId);
+      allow create: if isAuthenticated() && (
+        isGlobalAdmin() ||
+        isCommunityAdmin(request.resource.data.communityId) ||
+        isCommunityMember(request.resource.data.communityId)
+      );
       allow update: if isAuthenticated() && (
         resource.data.userId == request.auth.uid ||
         isCommunityAdmin(resource.data.communityId) ||
@@ -95,7 +99,11 @@ service cloud.firestore {
         isCommunityAdmin(resource.data.communityId) ||
         isGlobalAdmin()
       );
-      allow create: if isAuthenticated() && isCommunityMember(request.resource.data.communityId);
+      allow create: if isAuthenticated() && (
+        isGlobalAdmin() ||
+        isCommunityAdmin(request.resource.data.communityId) ||
+        isCommunityMember(request.resource.data.communityId)
+      );
       allow update: if isAuthenticated() && (
         resource.data.userId == request.auth.uid ||
         isCommunityAdmin(resource.data.communityId) ||

@@ -8,6 +8,7 @@ import ForgotPassword from './pages/auth/ForgotPassword'
 import Communities from './pages/communities/Communities'
 import CommunityDetail from './pages/communities/CommunityDetail'
 import CommunityCreate from './pages/communities/CommunityCreate'
+import CommunityEdit from './pages/communities/CommunityEdit'
 import Services from './pages/services/Services'
 import ServiceDetail from './pages/services/ServiceDetail'
 import ServiceCreate from './pages/services/ServiceCreate'
@@ -57,6 +58,7 @@ function AppRoutes() {
         <Route path="/comunidades" element={<Communities />} />
         <Route path="/comunidades/nova" element={<AdminRoute><CommunityCreate /></AdminRoute>} />
         <Route path="/comunidades/:id" element={<CommunityDetail />} />
+        <Route path="/comunidades/:id/editar" element={<AdminRoute><CommunityEdit /></AdminRoute>} />
         <Route path="/servicos" element={<Services />} />
         <Route path="/servicos/novo" element={<ServiceCreate />} />
         <Route path="/servicos/:id" element={<ServiceDetail />} />

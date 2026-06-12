@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { getCommunity, getServices, getCompanies } from '../../services/firestoreService'
-import { HiUserGroup, HiBriefcase, HiOfficeBuilding } from 'react-icons/hi'
+import { useAuth } from '../../contexts/AuthContext'
+import { HiUserGroup, HiBriefcase, HiOfficeBuilding, HiPencil } from 'react-icons/hi'
 
 export default function CommunityDetail() {
   const { id } = useParams()
+  const { isAdmin } = useAuth()
   const [community, setCommunity] = useState(null)
   const [services, setServices] = useState([])
   const [companies, setCompanies] = useState([])
@@ -58,6 +60,13 @@ export default function CommunityDetail() {
       </div>
 
       {/* Add buttons */}
+      <div style={{ display: 'flex', gap: '.75rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
+        {isAdmin && (
+          <Link to={`/comunidades/${id}/editar`} className="btn btn-outline btn-sm">
+            <HiPencil /> Editar Comunidade
+          </Link>
+        )}
+      </div>
       <div style={{ display: 'flex', gap: '.75rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
         <Link to={`/servicos/novo?community=${id}`} className="btn btn-primary btn-sm">
           + Cadastrar Serviço
