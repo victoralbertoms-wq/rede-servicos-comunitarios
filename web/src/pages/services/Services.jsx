@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { getServices } from '../../services/firestoreService'
+import { useAuth } from '../../contexts/AuthContext'
 import { HiBriefcase, HiSearch, HiStar, HiPlus } from 'react-icons/hi'
 
 const CATEGORIES = [
@@ -10,6 +11,7 @@ const CATEGORIES = [
 
 export default function Services() {
   const [searchParams] = useSearchParams()
+  const { user } = useAuth()
   const [allServices, setAllServices] = useState([])
   const [loading, setLoading] = useState(true)
   const [category, setCategory] = useState('Todos')
@@ -17,10 +19,10 @@ export default function Services() {
 
   useEffect(() => {
     setLoading(true)
-    getServices({ pageSize: 100 })
+    getServices({ pageSize: 100, userId: user?.uid })
       .then(({ docs }) => setAllServices(docs))
       .finally(() => setLoading(false))
-  }, [])
+  }, [user])
 
   const filtered = useMemo(() => {
     let result = allServices

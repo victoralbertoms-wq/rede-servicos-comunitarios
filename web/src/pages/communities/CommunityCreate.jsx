@@ -19,8 +19,9 @@ export default function CommunityCreate() {
       const id = await createCommunity({ ...data, adminIds: [user.uid] }, logoFile, photoFile)
       toast.success('Comunidade criada com sucesso!')
       navigate(`/comunidades/${id}`)
-    } catch {
-      toast.error('Erro ao criar comunidade.')
+    } catch (err) {
+      console.error(err)
+      toast.error(err.message || 'Erro ao criar comunidade.')
     } finally {
       setLoading(false)
     }

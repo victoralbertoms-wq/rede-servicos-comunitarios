@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { getCompanies } from '../../services/firestoreService'
+import { useAuth } from '../../contexts/AuthContext'
 import { HiOfficeBuilding, HiSearch, HiStar, HiPlus } from 'react-icons/hi'
 
 const CATEGORIES = [
@@ -9,6 +10,7 @@ const CATEGORIES = [
 ]
 
 export default function Companies() {
+  const { user } = useAuth()
   const [allCompanies, setAllCompanies] = useState([])
   const [loading, setLoading] = useState(true)
   const [category, setCategory] = useState('Todos')
@@ -16,10 +18,10 @@ export default function Companies() {
 
   useEffect(() => {
     setLoading(true)
-    getCompanies({ pageSize: 100 })
+    getCompanies({ pageSize: 100, userId: user?.uid })
       .then(({ docs }) => setAllCompanies(docs))
       .finally(() => setLoading(false))
-  }, [])
+  }, [user])
 
   const filtered = useMemo(() => {
     let result = allCompanies

@@ -67,12 +67,7 @@ service cloud.firestore {
     // ─── Services ─────────────────────────────────────────────────────────────
 
     match /services/{serviceId} {
-      allow read: if isAuthenticated() && (
-        resource.data.status == 'approved' ||
-        resource.data.userId == request.auth.uid ||
-        isCommunityAdmin(resource.data.communityId) ||
-        isGlobalAdmin()
-      );
+      allow read: if isAuthenticated();
       allow create: if isAuthenticated() && (
         isGlobalAdmin() ||
         isCommunityAdmin(request.resource.data.communityId) ||
@@ -93,12 +88,7 @@ service cloud.firestore {
     // ─── Companies ────────────────────────────────────────────────────────────
 
     match /companies/{companyId} {
-      allow read: if isAuthenticated() && (
-        resource.data.status == 'approved' ||
-        resource.data.userId == request.auth.uid ||
-        isCommunityAdmin(resource.data.communityId) ||
-        isGlobalAdmin()
-      );
+      allow read: if isAuthenticated();
       allow create: if isAuthenticated() && (
         isGlobalAdmin() ||
         isCommunityAdmin(request.resource.data.communityId) ||
