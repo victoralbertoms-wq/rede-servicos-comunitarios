@@ -41,6 +41,9 @@ jobs:
         working-directory: ./web
         run: npm run build
 
+      - name: Copy dist to firebase
+        run: cp -r web/dist firebase/dist
+
       - name: Deploy Firestore Rules & Indexes
         if: github.ref == 'refs/heads/main'
         uses: w9jds/firebase-action@master
