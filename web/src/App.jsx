@@ -12,9 +12,11 @@ import CommunityEdit from './pages/communities/CommunityEdit'
 import Services from './pages/services/Services'
 import ServiceDetail from './pages/services/ServiceDetail'
 import ServiceCreate from './pages/services/ServiceCreate'
+import ServiceEdit from './pages/services/ServiceEdit'
 import Companies from './pages/companies/Companies'
 import CompanyDetail from './pages/companies/CompanyDetail'
 import CompanyCreate from './pages/companies/CompanyCreate'
+import CompanyEdit from './pages/companies/CompanyEdit'
 import Favorites from './pages/favorites/Favorites'
 import Messages from './pages/messages/Messages'
 import Profile from './pages/profile/Profile'
@@ -62,9 +64,11 @@ function AppRoutes() {
         <Route path="/servicos" element={<Services />} />
         <Route path="/servicos/novo" element={<ServiceCreate />} />
         <Route path="/servicos/:id" element={<ServiceDetail />} />
+        <Route path="/servicos/:id/editar" element={<ServiceEdit />} />
         <Route path="/empresas" element={<Companies />} />
         <Route path="/empresas/nova" element={<CompanyCreate />} />
         <Route path="/empresas/:id" element={<CompanyDetail />} />
+        <Route path="/empresas/:id/editar" element={<CompanyEdit />} />
         <Route path="/favoritos" element={<Favorites />} />
         <Route path="/mensagens" element={<Messages />} />
         <Route path="/mensagens/:chatId" element={<Messages />} />

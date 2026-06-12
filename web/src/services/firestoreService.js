@@ -147,6 +147,10 @@ export async function getCompany(id) {
   return snap.exists() ? { id: snap.id, ...snap.data() } : null
 }
 
+export async function updateCompany(id, data) {
+  await updateDoc(doc(db, 'companies', id), { ...data, updatedAt: serverTimestamp() })
+}
+
 // ── Reviews ────────────────────────────────────────────────────────────────────
 
 export async function addReview({ targetId, targetType, userId, userName, userPhoto, rating, comment }) {

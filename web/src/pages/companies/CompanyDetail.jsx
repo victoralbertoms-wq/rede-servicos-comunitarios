@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { getCompany, getReviews, addReview, toggleFavorite } from '../../services/firestoreService'
 import { useAuth } from '../../contexts/AuthContext'
 import toast from 'react-hot-toast'
-import { HiStar, HiHeart, HiShare, HiPhone, HiMail, HiGlobeAlt, HiLocationMarker, HiChat } from 'react-icons/hi'
+import { HiStar, HiHeart, HiShare, HiPhone, HiMail, HiGlobeAlt, HiLocationMarker, HiChat, HiPencil } from 'react-icons/hi'
 import { SiWhatsapp } from 'react-icons/si'
 
 function Stars({ value, onChange }) {
@@ -23,7 +23,7 @@ function Stars({ value, onChange }) {
 
 export default function CompanyDetail() {
   const { id } = useParams()
-  const { user, userProfile } = useAuth()
+  const { user, userProfile, isAdmin } = useAuth()
   const navigate = useNavigate()
   const [company, setCompany] = useState(null)
   const [reviews, setReviews] = useState([])
@@ -87,6 +87,11 @@ export default function CompanyDetail() {
           <div style={{ display: 'flex', gap: '.5rem' }}>
             <button className="btn-icon" onClick={handleFavorite}><HiHeart size={20} style={{ color: isFav ? 'var(--error)' : undefined }} /></button>
             <button className="btn-icon" onClick={() => { navigator.clipboard.writeText(window.location.href); toast.success('Link copiado!') }}><HiShare size={20} /></button>
+            {(isAdmin || company.userId === user?.uid) && (
+              <button className="btn btn-outline btn-sm" onClick={() => navigate(`/empresas/${id}/editar`)}>
+                <HiPencil /> Editar
+              </button>
+            )}
             <button className="btn btn-primary btn-sm" onClick={() => navigate(`/mensagens?to=${company.userId}`)}><HiChat /> Mensagem</button>
           </div>
         </div>
