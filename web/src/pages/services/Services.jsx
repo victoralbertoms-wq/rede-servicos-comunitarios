@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { getServices } from '../../services/firestoreService'
 import { HiBriefcase, HiSearch, HiStar, HiPlus } from 'react-icons/hi'
@@ -10,17 +10,34 @@ const CATEGORIES = [
 
 export default function Services() {
   const [searchParams] = useSearchParams()
-  const [services, setServices] = useState([])
+  const [allServices, setAllServices] = useState([])
   const [loading, setLoading] = useState(true)
   const [category, setCategory] = useState('Todos')
   const [search, setSearch] = useState(searchParams.get('q') || '')
 
   useEffect(() => {
     setLoading(true)
-    getServices({ category: category === 'Todos' ? null : category, search, pageSize: 30 })
-      .then(({ docs }) => setServices(docs))
+    getServices({ pageSize: 100 })
+      .then(({ docs }) => setAllServices(docs))
       .finally(() => setLoading(false))
-  }, [category, search])
+  }, [])
+
+  const filtered = useMemo(() => {
+    let result = allServices
+    if (category !== 'Todos') {
+      result = result.filter(s => s.category === category)
+    }
+    if (search.trim()) {
+      const s = search.toLowerCase()
+      result = result.filter(d =>
+        d.name?.toLowerCase().includes(s) ||
+        d.category?.toLowerCase().includes(s) ||
+        d.specialty?.toLowerCase().includes(s) ||
+        d.city?.toLowerCase().includes(s)
+      )
+    }
+    return result
+  }, [allServices, category, search])
 
   return (
     <div>
@@ -36,14 +53,13 @@ export default function Services() {
         </div>
       </div>
 
-      {/* Filters */}
       <div style={{ marginBottom: '1.5rem', display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center' }}>
         <div className="search-box" style={{ flex: '1 1 280px', maxWidth: 380 }}>
           <HiSearch className="search-icon" size={18} />
           <input
             className="form-input"
             style={{ paddingLeft: '2.5rem' }}
-            placeholder="Buscar profissional..."
+            placeholder="Buscar por nome, categoria, cidade..."
             value={search}
             onChange={e => setSearch(e.target.value)}
           />
@@ -55,15 +71,15 @@ export default function Services() {
 
       {loading ? (
         <div style={{ display: 'flex', justifyContent: 'center', padding: '3rem' }}><div className="spinner" /></div>
-      ) : services.length === 0 ? (
+      ) : filtered.length === 0 ? (
         <div className="empty-state">
           <HiBriefcase />
           <h3>Nenhum serviço encontrado</h3>
-          <p>Tente outros filtros ou cadastre o seu serviço.</p>
+          <p>{search || category !== 'Todos' ? 'Tente outros filtros.' : 'Nenhum serviço aprovado ainda.'}</p>
         </div>
       ) : (
         <div className="grid-3">
-          {services.map(s => (
+          {filtered.map(s => (
             <Link key={s.id} to={`/servicos/${s.id}`} className="card" style={{ textDecoration: 'none' }}>
               <div style={{
                 height: 140,

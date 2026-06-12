@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { getCommunities, joinCommunity } from '../../services/firestoreService'
 import { useAuth } from '../../contexts/AuthContext'
@@ -44,9 +44,7 @@ function JoinModal({ community, onClose, onJoined }) {
               />
             </div>
           )}
-          <p style={{ fontSize: '.88rem', color: 'var(--text-muted)' }}>
-            {community.description}
-          </p>
+          <p style={{ fontSize: '.88rem', color: 'var(--text-muted)' }}>{community.description}</p>
         </div>
         <div className="modal-footer">
           <button className="btn btn-secondary" onClick={onClose}>Cancelar</button>
@@ -61,24 +59,28 @@ function JoinModal({ community, onClose, onJoined }) {
 
 export default function Communities() {
   const { isAdmin, userProfile } = useAuth()
-  const [communities, setCommunities] = useState([])
+  const [allCommunities, setAllCommunities] = useState([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [joining, setJoining] = useState(null)
   const navigate = useNavigate()
 
   useEffect(() => {
-    getCommunities(50)
-      .then(({ docs }) => setCommunities(docs))
+    getCommunities(100)
+      .then(({ docs }) => setAllCommunities(docs))
       .finally(() => setLoading(false))
   }, [])
 
-  const filtered = communities.filter(c =>
-    c.name?.toLowerCase().includes(search.toLowerCase())
-  )
+  const filtered = useMemo(() => {
+    if (!search.trim()) return allCommunities
+    const s = search.toLowerCase()
+    return allCommunities.filter(c =>
+      c.name?.toLowerCase().includes(s) ||
+      c.description?.toLowerCase().includes(s)
+    )
+  }, [allCommunities, search])
 
-  const isMember = (community) =>
-    userProfile?.communities?.includes(community.id)
+  const isMember = (community) => userProfile?.communities?.includes(community.id)
 
   return (
     <div>
@@ -115,7 +117,7 @@ export default function Communities() {
         <div className="empty-state">
           <HiUserGroup />
           <h3>Nenhuma comunidade encontrada</h3>
-          <p>Tente outro termo ou aguarde novas comunidades.</p>
+          <p>{search ? 'Tente outro termo de busca.' : 'Nenhuma comunidade cadastrada ainda.'}</p>
         </div>
       ) : (
         <div className="grid-3">
@@ -152,18 +154,11 @@ export default function Communities() {
                 )}
               </div>
               <div className="card-footer">
-                <button
-                  className="btn btn-outline btn-sm"
-                  onClick={() => navigate(`/comunidades/${community.id}`)}
-                >
+                <button className="btn btn-outline btn-sm" onClick={() => navigate(`/comunidades/${community.id}`)}>
                   Ver detalhes
                 </button>
                 {!isMember(community) ? (
-                  <button
-                    className="btn btn-primary btn-sm"
-                    style={{ marginLeft: 'auto' }}
-                    onClick={() => setJoining(community)}
-                  >
+                  <button className="btn btn-primary btn-sm" style={{ marginLeft: 'auto' }} onClick={() => setJoining(community)}>
                     Entrar
                   </button>
                 ) : (
@@ -181,7 +176,7 @@ export default function Communities() {
           onClose={() => setJoining(null)}
           onJoined={() => {
             setJoining(null)
-            getCommunities(50).then(({ docs }) => setCommunities(docs))
+            getCommunities(100).then(({ docs }) => setAllCommunities(docs))
           }}
         />
       )}

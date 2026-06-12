@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { getCompanies } from '../../services/firestoreService'
 import { HiOfficeBuilding, HiSearch, HiStar, HiPlus } from 'react-icons/hi'
@@ -9,17 +9,34 @@ const CATEGORIES = [
 ]
 
 export default function Companies() {
-  const [companies, setCompanies] = useState([])
+  const [allCompanies, setAllCompanies] = useState([])
   const [loading, setLoading] = useState(true)
   const [category, setCategory] = useState('Todos')
   const [search, setSearch] = useState('')
 
   useEffect(() => {
     setLoading(true)
-    getCompanies({ category: category === 'Todos' ? null : category, search, pageSize: 30 })
-      .then(({ docs }) => setCompanies(docs))
+    getCompanies({ pageSize: 100 })
+      .then(({ docs }) => setAllCompanies(docs))
       .finally(() => setLoading(false))
-  }, [category, search])
+  }, [])
+
+  const filtered = useMemo(() => {
+    let result = allCompanies
+    if (category !== 'Todos') {
+      result = result.filter(c => c.category === category)
+    }
+    if (search.trim()) {
+      const s = search.toLowerCase()
+      result = result.filter(c =>
+        c.name?.toLowerCase().includes(s) ||
+        c.category?.toLowerCase().includes(s) ||
+        c.description?.toLowerCase().includes(s) ||
+        c.city?.toLowerCase().includes(s)
+      )
+    }
+    return result
+  }, [allCompanies, category, search])
 
   return (
     <div>
@@ -39,7 +56,7 @@ export default function Companies() {
         <div className="search-box" style={{ flex: '1 1 280px', maxWidth: 380 }}>
           <HiSearch className="search-icon" size={18} />
           <input className="form-input" style={{ paddingLeft: '2.5rem' }}
-            placeholder="Buscar empresa..." value={search} onChange={e => setSearch(e.target.value)} />
+            placeholder="Buscar por nome, categoria, cidade..." value={search} onChange={e => setSearch(e.target.value)} />
         </div>
         <select className="form-input" style={{ flex: '0 0 auto', width: 'auto' }} value={category} onChange={e => setCategory(e.target.value)}>
           {CATEGORIES.map(c => <option key={c}>{c}</option>)}
@@ -48,15 +65,15 @@ export default function Companies() {
 
       {loading ? (
         <div style={{ display: 'flex', justifyContent: 'center', padding: '3rem' }}><div className="spinner" /></div>
-      ) : companies.length === 0 ? (
+      ) : filtered.length === 0 ? (
         <div className="empty-state">
           <HiOfficeBuilding />
           <h3>Nenhuma empresa encontrada</h3>
-          <p>Seja o primeiro a cadastrar sua empresa!</p>
+          <p>{search || category !== 'Todos' ? 'Tente outros filtros.' : 'Nenhuma empresa aprovada ainda.'}</p>
         </div>
       ) : (
         <div className="grid-3">
-          {companies.map(c => (
+          {filtered.map(c => (
             <Link key={c.id} to={`/empresas/${c.id}`} className="card" style={{ textDecoration: 'none' }}>
               <div style={{
                 height: 140,
