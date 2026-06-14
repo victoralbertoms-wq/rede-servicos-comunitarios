@@ -1,8 +1,66 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { getCommunities, getServices, getCompanies } from '../services/firestoreService'
 import { useAuth } from '../contexts/AuthContext'
 import { HiSearch, HiUserGroup, HiBriefcase, HiOfficeBuilding, HiStar, HiArrowRight } from 'react-icons/hi'
+
+const EXPO_URL = 'exp://u.expo.dev/fdef6951-adda-4c6b-abdc-41b60e93d8b9?channel-name=main'
+const PLAY_STORE = 'https://play.google.com/store/apps/details?id=host.exp.exponent'
+const APP_STORE = 'https://apps.apple.com/app/expo-go/id982107779'
+
+function AppDownloadBanner() {
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
+  const isAndroid = /Android/.test(navigator.userAgent)
+
+  const openApp = useCallback(() => {
+    window.location.href = EXPO_URL
+    setTimeout(() => {
+      window.location.href = isIOS ? APP_STORE : PLAY_STORE
+    }, 2500)
+  }, [isIOS])
+
+  return (
+    <div style={{
+      background: 'var(--surface)', border: '1.5px solid var(--border)', borderRadius: 'var(--radius-xl)',
+      padding: '1.5rem 2rem', marginBottom: '2.5rem',
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '.5rem', marginBottom: '.35rem' }}>
+        <span style={{ fontSize: '1.2rem' }}>📱</span>
+        <h3 style={{ fontWeight: 700, fontSize: '1rem' }}>Baixe o App no Celular</h3>
+      </div>
+      <p style={{ fontSize: '.85rem', color: 'var(--text-muted)', marginBottom: '1rem', lineHeight: 1.5 }}>
+        {isIOS || isAndroid
+          ? 'Toque no botão abaixo para abrir o app. Instale o Expo Go se ainda não tiver.'
+          : 'Acesse este site pelo celular e toque em "Abrir App" para instalar.'}
+      </p>
+      <div style={{ display: 'flex', gap: '.75rem', flexWrap: 'wrap' }}>
+        {(isAndroid || (!isIOS && !isAndroid)) && (
+          <button
+            onClick={openApp}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '.5rem', padding: '.65rem 1.4rem', borderRadius: 'var(--radius-full)', background: '#3ddc84', color: '#000', border: 'none', fontSize: '.9rem', fontWeight: 700, cursor: 'pointer' }}
+          >
+            ▶ Abrir App — Android
+          </button>
+        )}
+        {(isIOS || (!isIOS && !isAndroid)) && (
+          <button
+            onClick={openApp}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '.5rem', padding: '.65rem 1.4rem', borderRadius: 'var(--radius-full)', background: '#1a1a2e', color: '#fff', border: 'none', fontSize: '.9rem', fontWeight: 700, cursor: 'pointer' }}
+          >
+            🍎 Abrir App — iPhone
+          </button>
+        )}
+        <a
+          href={isIOS ? APP_STORE : PLAY_STORE}
+          target="_blank" rel="noreferrer"
+          style={{ display: 'inline-flex', alignItems: 'center', gap: '.5rem', padding: '.65rem 1.4rem', borderRadius: 'var(--radius-full)', border: '1.5px solid var(--border)', color: 'var(--text-muted)', textDecoration: 'none', fontSize: '.85rem', fontWeight: 600 }}
+        >
+          Instalar Expo Go
+        </a>
+      </div>
+    </div>
+  )
+}
 
 function StarRating({ rating }) {
   return (
@@ -131,41 +189,7 @@ export default function Home() {
       </div>
 
       {/* App mobile download */}
-      <div style={{
-        background: 'var(--surface)', border: '1.5px solid var(--border)', borderRadius: 'var(--radius-xl)',
-        padding: '1.75rem 2rem', marginBottom: '2.5rem',
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '.5rem', marginBottom: '.4rem' }}>
-          <span style={{ fontSize: '1.3rem' }}>📱</span>
-          <h3 style={{ fontWeight: 700, fontSize: '1.05rem' }}>Baixe o App no Celular</h3>
-        </div>
-        <p style={{ fontSize: '.88rem', color: 'var(--text-muted)', marginBottom: '1.1rem', lineHeight: 1.5 }}>
-          Clique no botão do seu celular para abrir o app. É necessário ter o <strong>Expo Go</strong> instalado.
-        </p>
-        <div style={{ display: 'flex', gap: '.75rem', flexWrap: 'wrap' }}>
-          <a
-            href="https://expo.dev/preview/update?message=primeira+versao&updateRuntimeVersion=1.0.0&createdAt=2026-06-14&slug=exp-updates-info&projectId=fdef6951-adda-4c6b-abdc-41b60e93d8b9&group=44574640-9d2e-4d2e-8210-f7f5f13412cb&host=u.expo.dev"
-            target="_blank" rel="noreferrer"
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '.5rem', padding: '.65rem 1.4rem', borderRadius: 'var(--radius-full)', background: '#3ddc84', color: '#000', textDecoration: 'none', fontSize: '.9rem', fontWeight: 700 }}
-          >
-            <span>▶</span> Abrir no Android
-          </a>
-          <a
-            href="https://expo.dev/preview/update?message=primeira+versao&updateRuntimeVersion=1.0.0&createdAt=2026-06-14&slug=exp-updates-info&projectId=fdef6951-adda-4c6b-abdc-41b60e93d8b9&group=44574640-9d2e-4d2e-8210-f7f5f13412cb&host=u.expo.dev"
-            target="_blank" rel="noreferrer"
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '.5rem', padding: '.65rem 1.4rem', borderRadius: 'var(--radius-full)', background: '#1a1a2e', color: '#fff', textDecoration: 'none', fontSize: '.9rem', fontWeight: 700 }}
-          >
-            <span>🍎</span> Abrir no iPhone
-          </a>
-          <a
-            href="https://play.google.com/store/apps/details?id=host.exp.exponent"
-            target="_blank" rel="noreferrer"
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '.5rem', padding: '.65rem 1.4rem', borderRadius: 'var(--radius-full)', border: '1.5px solid var(--border)', color: 'var(--text-muted)', textDecoration: 'none', fontSize: '.85rem', fontWeight: 600 }}
-          >
-            Instalar Expo Go
-          </a>
-        </div>
-      </div>
+      <AppDownloadBanner />
 
       {/* Quick links */}
       <div className="grid-3" style={{ marginBottom: '2.5rem' }}>
