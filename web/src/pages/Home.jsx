@@ -130,6 +130,50 @@ export default function Home() {
         </form>
       </div>
 
+      {/* App mobile download */}
+      <div style={{
+        background: 'var(--surface)', border: '1.5px solid var(--border)', borderRadius: 'var(--radius-xl)',
+        padding: '1.75rem 2rem', marginBottom: '2.5rem',
+        display: 'flex', alignItems: 'center', gap: '2rem', flexWrap: 'wrap',
+      }}>
+        <img
+          src={`https://api.qrserver.com/v1/create-qr-code/?data=exp%3A%2F%2Fu.expo.dev%2Ffdef6951-adda-4c6b-abdc-41b60e93d8b9%3Fchannel-name%3Dmain&size=120x120`}
+          alt="QR Code app"
+          style={{ width: 100, height: 100, borderRadius: 8, flexShrink: 0 }}
+        />
+        <div style={{ flex: 1, minWidth: 200 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '.5rem', marginBottom: '.4rem' }}>
+            <span style={{ fontSize: '1.3rem' }}>📱</span>
+            <h3 style={{ fontWeight: 700, fontSize: '1.05rem' }}>Baixe o App no Celular</h3>
+          </div>
+          <p style={{ fontSize: '.88rem', color: 'var(--text-muted)', marginBottom: '.85rem', lineHeight: 1.5 }}>
+            Instale o <strong>Expo Go</strong> no seu celular e escaneie o QR ao lado para abrir o app.
+          </p>
+          <div style={{ display: 'flex', gap: '.75rem', flexWrap: 'wrap' }}>
+            <a
+              href="https://play.google.com/store/apps/details?id=host.exp.exponent"
+              target="_blank" rel="noreferrer"
+              style={{ display: 'flex', alignItems: 'center', gap: '.4rem', padding: '.5rem 1rem', borderRadius: 'var(--radius-full)', background: '#1a1a2e', color: '#fff', textDecoration: 'none', fontSize: '.82rem', fontWeight: 600 }}
+            >
+              <span>▶</span> Expo Go — Android
+            </a>
+            <a
+              href="https://apps.apple.com/app/expo-go/id982107779"
+              target="_blank" rel="noreferrer"
+              style={{ display: 'flex', alignItems: 'center', gap: '.4rem', padding: '.5rem 1rem', borderRadius: 'var(--radius-full)', background: '#1a1a2e', color: '#fff', textDecoration: 'none', fontSize: '.82rem', fontWeight: 600 }}
+            >
+              <span></span> Expo Go — iPhone
+            </a>
+            <a
+              href="exp://u.expo.dev/fdef6951-adda-4c6b-abdc-41b60e93d8b9?channel-name=main"
+              style={{ display: 'flex', alignItems: 'center', gap: '.4rem', padding: '.5rem 1rem', borderRadius: 'var(--radius-full)', background: 'var(--primary)', color: '#fff', textDecoration: 'none', fontSize: '.82rem', fontWeight: 600 }}
+            >
+              Abrir app direto
+            </a>
+          </div>
+        </div>
+      </div>
+
       {/* Quick links */}
       <div className="grid-3" style={{ marginBottom: '2.5rem' }}>
         {[
