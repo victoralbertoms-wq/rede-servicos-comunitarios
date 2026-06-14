@@ -7,7 +7,7 @@ import { HiUserGroup, HiBriefcase, HiOfficeBuilding, HiPencil, HiTrash } from 'r
 
 export default function CommunityDetail() {
   const { id } = useParams()
-  const { isAdmin } = useAuth()
+  const { user, isAdmin } = useAuth()
   const navigate = useNavigate()
   const [community, setCommunity] = useState(null)
   const [services, setServices] = useState([])
@@ -73,18 +73,16 @@ export default function CommunityDetail() {
       </div>
 
       {/* Add buttons */}
-      <div style={{ display: 'flex', gap: '.75rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
-        {isAdmin && (
-          <>
-            <Link to={`/comunidades/${id}/editar`} className="btn btn-outline btn-sm">
-              <HiPencil /> Editar
-            </Link>
-            <button className="btn btn-sm" style={{ background: 'var(--error)', color: '#fff' }} onClick={handleDelete}>
-              <HiTrash /> Excluir
-            </button>
-          </>
-        )}
-      </div>
+      {(isAdmin || (user && community.adminIds?.includes(user.uid))) && (
+        <div style={{ display: 'flex', gap: '.75rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
+          <Link to={`/comunidades/${id}/editar`} className="btn btn-outline btn-sm">
+            <HiPencil /> Editar
+          </Link>
+          <button className="btn btn-sm" style={{ background: 'var(--error)', color: '#fff' }} onClick={handleDelete}>
+            <HiTrash /> Excluir
+          </button>
+        </div>
+      )}
       <div style={{ display: 'flex', gap: '.75rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
         <Link to={`/servicos/novo?community=${id}`} className="btn btn-primary btn-sm">
           + Cadastrar Serviço

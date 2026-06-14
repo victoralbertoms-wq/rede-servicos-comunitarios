@@ -8,7 +8,7 @@ import toast from 'react-hot-toast'
 
 export default function CommunityEdit() {
   const { id } = useParams()
-  const { isAdmin } = useAuth()
+  const { user, isAdmin } = useAuth()
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [fetching, setFetching] = useState(true)
@@ -33,16 +33,19 @@ export default function CommunityEdit() {
       await updateCommunity(id, updates)
       toast.success('Comunidade atualizada!')
       navigate(`/comunidades/${id}`)
-    } catch {
+    } catch (err) {
+      console.error(err)
       toast.error('Erro ao atualizar comunidade.')
     } finally {
       setLoading(false)
     }
   }
 
-  if (!isAdmin) return <div className="empty-state"><h3>Acesso negado</h3></div>
   if (fetching) return <div style={{ display: 'flex', justifyContent: 'center', padding: '3rem' }}><div className="spinner" /></div>
   if (!community) return <div className="empty-state"><h3>Comunidade não encontrada</h3></div>
+
+  const canEdit = isAdmin || (user && community.adminIds?.includes(user.uid))
+  if (!canEdit) return <div className="empty-state"><h3>Acesso negado</h3></div>
 
   return (
     <div style={{ maxWidth: 640, margin: '0 auto' }}>

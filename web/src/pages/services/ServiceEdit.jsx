@@ -11,7 +11,11 @@ const CATEGORIES = [
   'Saúde', 'Psicologia', 'Educação', 'Mecânica', 'Tecnologia',
   'Beleza & Estética', 'Gastronomia', 'Transporte', 'Outros',
 ]
-const STATES = ['AC','AL','AM','AP','BA','CE','DF','ES','GO','MA','MG','MS','MT','PA','PB','PE','PI','PR','RJ','RN','RO','RR','RS','SC','SE','SP','TO']
+
+const STATES = [
+  'AC','AL','AM','AP','BA','CE','DF','ES','GO','MA','MG','MS','MT',
+  'PA','PB','PE','PI','PR','RJ','RN','RO','RR','RS','SC','SE','SP','TO'
+]
 
 export default function ServiceEdit() {
   const { id } = useParams()
@@ -25,14 +29,18 @@ export default function ServiceEdit() {
 
   useEffect(() => {
     getService(id).then(s => {
-      if (!s) return navigate('/servicos')
       setService(s)
-      reset(s)
+      reset({
+        name: s.name, category: s.category, specialty: s.specialty,
+        description: s.description, phone: s.phone, whatsapp: s.whatsapp,
+        email: s.email, city: s.city, state: s.state, address: s.address,
+        website: s.website, workingHours: s.workingHours,
+        instagram: s.instagram, facebook: s.facebook,
+      })
     }).finally(() => setFetching(false))
-  }, [id, reset, navigate])
+  }, [id, reset])
 
   async function onSubmit(data) {
-    if (!isAdmin && service.userId !== user.uid) return toast.error('Sem permissão.')
     setLoading(true)
     try {
       const updates = { ...data }
@@ -41,13 +49,18 @@ export default function ServiceEdit() {
       toast.success('Serviço atualizado!')
       navigate(`/servicos/${id}`)
     } catch (err) {
-      toast.error(err.message || 'Erro ao atualizar serviço.')
+      console.error(err)
+      toast.error('Erro ao atualizar serviço.')
     } finally {
       setLoading(false)
     }
   }
 
   if (fetching) return <div style={{ display: 'flex', justifyContent: 'center', padding: '3rem' }}><div className="spinner" /></div>
+  if (!service) return <div className="empty-state"><h3>Serviço não encontrado</h3></div>
+
+  const canEdit = isAdmin || service.userId === user?.uid
+  if (!canEdit) return <div className="empty-state"><h3>Acesso negado</h3></div>
 
   return (
     <div style={{ maxWidth: 720, margin: '0 auto' }}>
@@ -59,25 +72,17 @@ export default function ServiceEdit() {
       <div className="card">
         <div className="card-body">
           <form onSubmit={handleSubmit(onSubmit)}>
-
-            <div className="form-group">
-              <label className="form-label">Foto atual</label>
-              {service?.photoURL
-                ? <img src={service.photoURL} alt="foto atual" style={{ width: '100%', maxHeight: 180, objectFit: 'cover', borderRadius: 8, marginBottom: '.5rem' }} />
-                : <p style={{ fontSize: '.82rem', color: 'var(--text-muted)', marginBottom: '.5rem' }}>Sem foto</p>
-              }
-              <input className="form-input" type="file" accept="image/*" onChange={e => setPhotoFile(e.target.files[0])} />
-            </div>
-
             <div className="grid-2">
               <div className="form-group">
                 <label className="form-label">Nome do profissional *</label>
-                <input className={`form-input ${errors.name ? 'error' : ''}`} {...register('name', { required: 'Obrigatório' })} />
+                <input className={`form-input ${errors.name ? 'error' : ''}`}
+                  {...register('name', { required: 'Campo obrigatório' })} />
                 {errors.name && <span className="form-error">{errors.name.message}</span>}
               </div>
               <div className="form-group">
                 <label className="form-label">Categoria *</label>
-                <select className={`form-input ${errors.category ? 'error' : ''}`} {...register('category', { required: 'Obrigatório' })}>
+                <select className={`form-input ${errors.category ? 'error' : ''}`}
+                  {...register('category', { required: 'Selecione a categoria' })}>
                   <option value="">Selecione...</option>
                   {CATEGORIES.map(c => <option key={c}>{c}</option>)}
                 </select>
@@ -114,12 +119,14 @@ export default function ServiceEdit() {
             <div className="grid-2">
               <div className="form-group">
                 <label className="form-label">Cidade *</label>
-                <input className={`form-input ${errors.city ? 'error' : ''}`} {...register('city', { required: 'Obrigatório' })} />
+                <input className={`form-input ${errors.city ? 'error' : ''}`}
+                  {...register('city', { required: 'Campo obrigatório' })} />
                 {errors.city && <span className="form-error">{errors.city.message}</span>}
               </div>
               <div className="form-group">
                 <label className="form-label">Estado *</label>
-                <select className={`form-input ${errors.state ? 'error' : ''}`} {...register('state', { required: 'Obrigatório' })}>
+                <select className={`form-input ${errors.state ? 'error' : ''}`}
+                  {...register('state', { required: 'Selecione o estado' })}>
                   <option value="">UF</option>
                   {STATES.map(s => <option key={s}>{s}</option>)}
                 </select>
@@ -152,6 +159,14 @@ export default function ServiceEdit() {
                 <label className="form-label">Facebook</label>
                 <input className="form-input" {...register('facebook')} />
               </div>
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Nova Foto</label>
+              {service.photoURL && (
+                <img src={service.photoURL} alt="foto atual" style={{ width: '100%', height: 120, objectFit: 'cover', borderRadius: 8, marginBottom: '.5rem', display: 'block' }} />
+              )}
+              <input className="form-input" type="file" accept="image/*" onChange={e => setPhotoFile(e.target.files[0])} />
             </div>
 
             <div style={{ display: 'flex', gap: '.75rem', justifyContent: 'flex-end', marginTop: '.5rem' }}>

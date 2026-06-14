@@ -22,14 +22,17 @@ export default function CompanyEdit() {
 
   useEffect(() => {
     getCompany(id).then(c => {
-      if (!c) return navigate('/empresas')
       setCompany(c)
-      reset(c)
+      reset({
+        name: c.name, legalName: c.legalName, cnpj: c.cnpj, category: c.category,
+        description: c.description, phone: c.phone, whatsapp: c.whatsapp,
+        email: c.email, address: c.address, website: c.website, instagram: c.instagram,
+        city: c.city, state: c.state,
+      })
     }).finally(() => setFetching(false))
-  }, [id, reset, navigate])
+  }, [id, reset])
 
   async function onSubmit(data) {
-    if (!isAdmin && company.userId !== user.uid) return toast.error('Sem permissão.')
     setLoading(true)
     try {
       const updates = { ...data }
@@ -39,53 +42,51 @@ export default function CompanyEdit() {
       toast.success('Empresa atualizada!')
       navigate(`/empresas/${id}`)
     } catch (err) {
-      toast.error(err.message || 'Erro ao atualizar empresa.')
+      console.error(err)
+      toast.error('Erro ao atualizar empresa.')
     } finally {
       setLoading(false)
     }
   }
 
   if (fetching) return <div style={{ display: 'flex', justifyContent: 'center', padding: '3rem' }}><div className="spinner" /></div>
+  if (!company) return <div className="empty-state"><h3>Empresa não encontrada</h3></div>
+
+  const canEdit = isAdmin || company.userId === user?.uid
+  if (!canEdit) return <div className="empty-state"><h3>Acesso negado</h3></div>
 
   return (
     <div style={{ maxWidth: 720, margin: '0 auto' }}>
       <div className="page-header">
         <h1>Editar Empresa</h1>
-        <p>Atualize as informações da empresa</p>
+        <p>Atualize as informações da sua empresa</p>
       </div>
 
       <div className="card">
         <div className="card-body">
           <form onSubmit={handleSubmit(onSubmit)}>
-
             <div className="grid-2">
               <div className="form-group">
-                <label className="form-label">Logo atual</label>
-                {company?.logoURL
-                  ? <img src={company.logoURL} alt="logo" style={{ width: 64, height: 64, objectFit: 'cover', borderRadius: 10, marginBottom: '.5rem', display: 'block' }} />
-                  : <p style={{ fontSize: '.82rem', color: 'var(--text-muted)', marginBottom: '.5rem' }}>Sem logo</p>
-                }
-                <input className="form-input" type="file" accept="image/*" onChange={e => setLogoFile(e.target.files[0])} />
+                <label className="form-label">Nome da empresa *</label>
+                <input className={`form-input ${errors.name ? 'error' : ''}`}
+                  {...register('name', { required: 'Campo obrigatório' })} />
+                {errors.name && <span className="form-error">{errors.name.message}</span>}
               </div>
               <div className="form-group">
-                <label className="form-label">Foto de capa atual</label>
-                {company?.photoURL
-                  ? <img src={company.photoURL} alt="capa" style={{ width: '100%', height: 64, objectFit: 'cover', borderRadius: 10, marginBottom: '.5rem', display: 'block' }} />
-                  : <p style={{ fontSize: '.82rem', color: 'var(--text-muted)', marginBottom: '.5rem' }}>Sem foto</p>
-                }
-                <input className="form-input" type="file" accept="image/*" onChange={e => setPhotoFile(e.target.files[0])} />
+                <label className="form-label">Razão social</label>
+                <input className="form-input" {...register('legalName')} />
               </div>
             </div>
 
             <div className="grid-2">
               <div className="form-group">
-                <label className="form-label">Nome da empresa *</label>
-                <input className={`form-input ${errors.name ? 'error' : ''}`} {...register('name', { required: 'Obrigatório' })} />
-                {errors.name && <span className="form-error">{errors.name.message}</span>}
+                <label className="form-label">CNPJ</label>
+                <input className="form-input" {...register('cnpj')} />
               </div>
               <div className="form-group">
                 <label className="form-label">Categoria *</label>
-                <select className={`form-input ${errors.category ? 'error' : ''}`} {...register('category', { required: 'Obrigatório' })}>
+                <select className={`form-input ${errors.category ? 'error' : ''}`}
+                  {...register('category', { required: 'Selecione a categoria' })}>
                   <option value="">Selecione...</option>
                   {CATEGORIES.map(c => <option key={c}>{c}</option>)}
                 </select>
@@ -95,7 +96,7 @@ export default function CompanyEdit() {
 
             <div className="form-group">
               <label className="form-label">Descrição</label>
-              <textarea className="form-input" rows={3} {...register('description')} />
+              <textarea className="form-input" rows={4} {...register('description')} />
             </div>
 
             <div className="grid-2">
@@ -114,6 +115,11 @@ export default function CompanyEdit() {
               <input className="form-input" type="email" {...register('email')} />
             </div>
 
+            <div className="form-group">
+              <label className="form-label">Endereço completo</label>
+              <input className="form-input" {...register('address')} />
+            </div>
+
             <div className="grid-2">
               <div className="form-group">
                 <label className="form-label">Cidade</label>
@@ -128,14 +134,32 @@ export default function CompanyEdit() {
               </div>
             </div>
 
-            <div className="form-group">
-              <label className="form-label">Endereço</label>
-              <input className="form-input" {...register('address')} />
+            <div className="grid-2">
+              <div className="form-group">
+                <label className="form-label">Site</label>
+                <input className="form-input" {...register('website')} />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Instagram</label>
+                <input className="form-input" {...register('instagram')} />
+              </div>
             </div>
 
-            <div className="form-group">
-              <label className="form-label">Site</label>
-              <input className="form-input" {...register('website')} />
+            <div className="grid-2">
+              <div className="form-group">
+                <label className="form-label">Nova Logo</label>
+                {company.logoURL && (
+                  <img src={company.logoURL} alt="logo atual" style={{ width: 48, height: 48, borderRadius: 8, objectFit: 'cover', marginBottom: '.5rem', display: 'block' }} />
+                )}
+                <input className="form-input" type="file" accept="image/*" onChange={e => setLogoFile(e.target.files[0])} />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Nova Foto de Capa</label>
+                {company.photoURL && (
+                  <img src={company.photoURL} alt="foto atual" style={{ width: '100%', height: 60, objectFit: 'cover', borderRadius: 8, marginBottom: '.5rem', display: 'block' }} />
+                )}
+                <input className="form-input" type="file" accept="image/*" onChange={e => setPhotoFile(e.target.files[0])} />
+              </div>
             </div>
 
             <div style={{ display: 'flex', gap: '.75rem', justifyContent: 'flex-end', marginTop: '.5rem' }}>
