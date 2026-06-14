@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Novo Computador — Rede de Serviços Comunitários</title>
+<style>
+  :root {
+    --primary: #7c3aed;
+    --primary-light: #f5f3ff;
+    --secondary: #0ea5e9;
+    --success: #22c55e;
+    --success-light: #dcfce7;
+    --warning: #f59e0b;
+    --warning-light: #fef3c7;
+    --danger: #ef4444;
+    --danger-light: #fee2e2;
+    --text: #1e293b;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
+    --bg: #f8fafc;
+    --white: #ffffff;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; }
+
+  .sidebar { position: fixed; top: 0; left: 0; width: 260px; height: 100vh; background: var(--white); border-right: 1px solid var(--border); overflow-y: auto; padding: 2rem 0; z-index: 100; }
+  .sidebar-logo { padding: 0 1.5rem 1.5rem; border-bottom: 1px solid var(--border); margin-bottom: 1rem; }
+  .sidebar-logo h2 { font-size: .85rem; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: .05em; }
+  .sidebar-logo p { font-size: .75rem; color: var(--text-muted); margin-top: .2rem; }
+  .nav-group { padding: .5rem 1.5rem; }
+  .nav-group-title { font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--text-muted); margin-bottom: .4rem; }
+  .nav-link { display: block; padding: .4rem .75rem; border-radius: 6px; text-decoration: none; font-size: .85rem; color: var(--text-muted); transition: all .15s; margin-bottom: .1rem; }
+  .nav-link:hover, .nav-link.active { background: var(--primary-light); color: var(--primary); font-weight: 600; }
+  .content { margin-left: 260px; padding: 3rem 4rem; max-width: 1100px; }
+
+  .page-header { background: linear-gradient(135deg, #7c3aed, #4f46e5); color: white; padding: 3rem; border-radius: 16px; margin-bottom: 3rem; }
+  .page-header .badge { display: inline-block; background: rgba(255,255,255,.2); padding: .3rem .8rem; border-radius: 100px; font-size: .75rem; font-weight: 600; margin-bottom: 1rem; letter-spacing: .05em; text-transform: uppercase; }
+  .page-header h1 { font-size: 2.2rem; font-weight: 800; margin-bottom: .5rem; }
+  .page-header p { opacity: .85; font-size: 1.05rem; }
+
+  section { margin-bottom: 3rem; scroll-margin-top: 2rem; }
+  h2 { font-size: 1.35rem; font-weight: 700; color: var(--text); margin-bottom: 1.25rem; padding-bottom: .6rem; border-bottom: 2px solid var(--border); display: flex; align-items: center; gap: .5rem; }
+  h2 .icon { width: 32px; height: 32px; background: var(--primary-light); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1rem; }
+  h3 { font-size: 1rem; font-weight: 700; margin: 1.5rem 0 .75rem; color: var(--primary); }
+  p { margin-bottom: .75rem; color: var(--text-muted); }
+
+  /* Big steps */
+  .big-steps { display: flex; flex-direction: column; gap: 1.5rem; }
+  .big-step { background: var(--white); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+  .big-step-header { display: flex; align-items: center; gap: 1rem; padding: 1.25rem 1.5rem; background: var(--primary-light); border-bottom: 1px solid var(--border); }
+  .big-step-num { width: 36px; height: 36px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: .95rem; flex-shrink: 0; }
+  .big-step-header h3 { margin: 0; color: var(--primary); font-size: 1rem; }
+  .big-step-header p { margin: 0; font-size: .8rem; color: var(--text-muted); }
+  .big-step-body { padding: 1.25rem 1.5rem; }
+
+  /* Alert boxes */
+  .alert { padding: 1rem 1.25rem; border-radius: 10px; margin-bottom: 1rem; display: flex; gap: .75rem; align-items: flex-start; font-size: .9rem; }
+  .alert-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: .05rem; }
+  .alert-info { background: var(--primary-light); border-left: 4px solid var(--primary); }
+  .alert-warning { background: var(--warning-light); border-left: 4px solid var(--warning); }
+  .alert-success { background: var(--success-light); border-left: 4px solid var(--success); }
+  .alert-danger { background: var(--danger-light); border-left: 4px solid var(--danger); }
+
+  /* Code */
+  pre { background: #1e293b; color: #e2e8f0; padding: 1.25rem 1.5rem; border-radius: 10px; overflow-x: auto; font-size: .82rem; line-height: 1.6; margin-bottom: 1rem; position: relative; }
+  code { font-family: 'Cascadia Code', 'Fira Code', monospace; }
+  .inline-code { background: var(--primary-light); color: var(--primary); padding: .1rem .4rem; border-radius: 4px; font-size: .85em; font-family: monospace; }
+  .copy-btn { position: absolute; top: .75rem; right: .75rem; background: rgba(255,255,255,.1); color: #94a3b8; border: 1px solid rgba(255,255,255,.15); border-radius: 6px; padding: .3rem .7rem; font-size: .75rem; cursor: pointer; transition: all .15s; }
+  .copy-btn:hover { background: rgba(255,255,255,.2); color: white; }
+  .copy-btn.copied { background: #22c55e; color: white; border-color: #22c55e; }
+
+  /* Not-needed grid */
+  .not-needed { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+  .not-needed-item { background: var(--white); border: 2px solid var(--success); border-radius: 12px; padding: 1rem 1.25rem; display: flex; gap: .75rem; align-items: flex-start; }
+  .not-needed-item .ni-icon { font-size: 1.3rem; flex-shrink: 0; }
+  .not-needed-item h4 { font-size: .85rem; font-weight: 700; margin-bottom: .15rem; }
+  .not-needed-item p { font-size: .78rem; margin: 0; }
+
+  /* Summary */
+  .summary-box { background: #1e293b; color: #e2e8f0; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; }
+  .summary-box h4 { color: #94a3b8; font-size: .75rem; text-transform: uppercase; letter-spacing: .1em; margin-bottom: 1rem; }
+  .summary-box pre { background: none; padding: 0; margin: 0; }
+
+  /* Download block */
+  .download-block { background: linear-gradient(135deg, var(--primary-light), #e0e7ff); border: 1px solid #c7d2fe; border-radius: 14px; padding: 1.5rem 2rem; display: flex; align-items: center; gap: 1.5rem; margin-bottom: 1.5rem; }
+  .download-block .dl-icon { font-size: 2.5rem; }
+  .download-block h4 { font-size: 1rem; font-weight: 700; margin-bottom: .25rem; color: var(--primary); }
+  .download-block p { margin: 0; font-size: .85rem; }
+
+  @media (max-width: 768px) {
+    .sidebar { display: none; }
+    .content { margin-left: 0; padding: 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <h2>💻 Novo Computador</h2>
+    <p>Rede de Serviços Comunitários</p>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-title">Visão Geral</div>
+    <a href="#visao" class="nav-link">Como funciona</a>
+    <a href="#nao-precisa" class="nav-link">O que NÃO precisar fazer</a>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-title">Passo a Passo</div>
+    <a href="#passo1" class="nav-link">1. Instalar programas</a>
+    <a href="#passo2" class="nav-link">2. Clonar repositório</a>
+    <a href="#passo3" class="nav-link">3. Criar o .env</a>
+    <a href="#passo4" class="nav-link">4. Instalar e rodar</a>
+    <a href="#passo5" class="nav-link">5. Firebase CLI</a>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-title">Publicar</div>
+    <a href="#publicar" class="nav-link">Fazer alterações</a>
+    <a href="#erro-git" class="nav-link">Erro de credenciais Git</a>
+    <a href="#resumo" class="nav-link">Resumo rápido</a>
+  </div>
+</nav>
+
+<main class="content">
+  <div class="page-header">
+    <div class="badge">💻 Portabilidade</div>
+    <h1>Novo Computador</h1>
+    <p>Como colocar o projeto para rodar em qualquer máquina em poucos minutos</p>
+  </div>
+
+  <!-- Visão geral -->
+  <section id="visao">
+    <h2><span class="icon">☁️</span> Como funciona</h2>
+    <p>O código fica no <strong>GitHub</strong>. O banco de dados fica no <strong>Firebase</strong>. As imagens ficam no <strong>Cloudinary</strong>. Tudo na nuvem.</p>
+    <p>Para rodar em um computador novo, você só precisa <strong>clonar o repositório</strong>, criar o arquivo <strong>.env</strong> com as credenciais e instalar as dependências. Nenhum dado precisa ser transferido entre máquinas.</p>
+    <div class="download-block">
+      <div class="dl-icon">🔗</div>
+      <div>
+        <h4>Repositório no GitHub</h4>
+        <p>github.com/victoralbertoms-wq/rede-servicos-comunitarios</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- O que NÃO precisar fazer -->
+  <section id="nao-precisa">
+    <h2><span class="icon">✅</span> O que NÃO precisa fazer</h2>
+    <div class="not-needed">
+      <div class="not-needed-item">
+        <div class="ni-icon">🗄️</div>
+        <div><h4>Banco de dados</h4><p>O Firestore fica na nuvem, não precisa transferir</p></div>
+      </div>
+      <div class="not-needed-item">
+        <div class="ni-icon">🖼️</div>
+        <div><h4>Imagens</h4><p>O Cloudinary fica na nuvem, não precisa mover nada</p></div>
+      </div>
+      <div class="not-needed-item">
+        <div class="ni-icon">🔥</div>
+        <div><h4>Reconfigurar Firebase</h4><p>O projeto já está criado na nuvem</p></div>
+      </div>
+      <div class="not-needed-item">
+        <div class="ni-icon">⚙️</div>
+        <div><h4>GitHub Actions</h4><p>Já está configurado no repositório</p></div>
+      </div>
+      <div class="not-needed-item">
+        <div class="ni-icon">🚀</div>
+        <div><h4>Deploy manual</h4><p>O git push já cuida disso automaticamente</p></div>
+      </div>
+      <div class="not-needed-item">
+        <div class="ni-icon">📦</div>
+        <div><h4>Transferir node_modules</h4><p>O npm install baixa tudo novamente</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Passo 1 -->
+  <section id="passo1">
+    <h2><span class="icon">1️⃣</span> Instalar os Programas Necessários</h2>
+    <div class="big-steps">
+      <div class="big-step">
+        <div class="big-step-header">
+          <div class="big-step-num">A</div>
+          <div><h3>Node.js 18 ou superior</h3><p>nodejs.org — marque "Add to PATH" durante a instalação</p></div>
+        </div>
+        <div class="big-step-body">
+          <p>Após instalar, abra o terminal e verifique:</p>
+          <pre><code>node --version   # deve mostrar v18.x ou superior
+npm --version</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+        </div>
+      </div>
+      <div class="big-step">
+        <div class="big-step-header">
+          <div class="big-step-num">B</div>
+          <div><h3>Git</h3><p>git-scm.com — escolha "Git from the command line" durante a instalação</p></div>
+        </div>
+        <div class="big-step-body">
+          <pre><code>git --version</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+        </div>
+      </div>
+      <div class="big-step">
+        <div class="big-step-header">
+          <div class="big-step-num">C</div>
+          <div><h3>Firebase CLI</h3><p>Instalar via npm após ter o Node.js instalado</p></div>
+        </div>
+        <div class="big-step-body">
+          <pre><code>npm install -g firebase-tools
+firebase --version</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Passo 2 -->
+  <section id="passo2">
+    <h2><span class="icon">2️⃣</span> Clonar o Repositório</h2>
+    <p>Abra o terminal (PowerShell no Windows, Terminal no Mac/Linux) e rode:</p>
+    <pre><code>git clone https://github.com/victoralbertoms-wq/rede-servicos-comunitarios.git
+cd rede-servicos-comunitarios</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+    <div class="alert alert-info">
+      <span class="alert-icon">💡</span>
+      <span>Isso baixa todo o código do GitHub para o seu computador. Demora alguns segundos.</span>
+    </div>
+  </section>
+
+  <!-- Passo 3 -->
+  <section id="passo3">
+    <h2><span class="icon">3️⃣</span> Criar o Arquivo .env</h2>
+    <div class="alert alert-warning">
+      <span class="alert-icon">⚠️</span>
+      <span>O arquivo <strong>.env</strong> não vai para o GitHub por segurança (está no .gitignore). Por isso precisa ser criado manualmente em cada computador novo.</span>
+    </div>
+    <p>Dentro da pasta <span class="inline-code">web/</span>, crie um arquivo chamado <span class="inline-code">.env</span> com este conteúdo:</p>
+    <pre><code>VITE_FIREBASE_API_KEY=AIzaSyDzHsXE4jc8pvSwaDl171xVXbA_qqXBwf4
+VITE_FIREBASE_AUTH_DOMAIN=rede-servicos.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=rede-servicos
+VITE_FIREBASE_MESSAGING_SENDER_ID=1008910813540
+VITE_FIREBASE_APP_ID=1:1008910813540:web:5b7ce8485fa4b095c25271
+VITE_FIREBASE_MEASUREMENT_ID=
+VITE_CLOUDINARY_CLOUD_NAME=dh3v2u54h
+VITE_CLOUDINARY_UPLOAD_PRESET=rede-servicos</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+    <div class="alert alert-info">
+      <span class="alert-icon">💡</span>
+      <span>No Windows: abra o Bloco de Notas, cole o conteúdo acima e salve como <strong>.env</strong> (com o ponto na frente) dentro da pasta <strong>web/</strong>. Certifique-se de que não ficou <strong>.env.txt</strong>.</span>
+    </div>
+  </section>
+
+  <!-- Passo 4 -->
+  <section id="passo4">
+    <h2><span class="icon">4️⃣</span> Instalar Dependências e Rodar</h2>
+    <pre><code>cd web
+npm install
+npm run dev</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+    <div class="alert alert-success">
+      <span class="alert-icon">✅</span>
+      <span>Abra o navegador em <strong>http://localhost:3000</strong> — o sistema vai aparecer conectado ao mesmo banco de dados de produção.</span>
+    </div>
+    <p>O <span class="inline-code">npm install</span> pode demorar 1–2 minutos na primeira vez (baixa as dependências).</p>
+  </section>
+
+  <!-- Passo 5 -->
+  <section id="passo5">
+    <h2><span class="icon">5️⃣</span> Firebase CLI (só para deploy)</h2>
+    <p>Se precisar fazer deploy das regras ou do site a partir deste computador:</p>
+    <pre><code>firebase login</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+    <p>Vai abrir o navegador para fazer login com a conta Google do projeto. Depois:</p>
+    <pre><code>cd firebase
+firebase deploy --only firestore:rules</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+  </section>
+
+  <!-- Publicar -->
+  <section id="publicar">
+    <h2><span class="icon">🚀</span> Fazer Alterações e Publicar</h2>
+    <p>O site em produção é atualizado <strong>automaticamente</strong> quando você faz <span class="inline-code">git push</span>. O GitHub Actions cuida do deploy.</p>
+    <pre><code># 1. Fazer as alterações no código
+
+# 2. Salvar e publicar
+git add .
+git commit -m "descrição do que foi alterado"
+git push</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+    <div class="alert alert-success">
+      <span class="alert-icon">🌐</span>
+      <span>Em 1–2 minutos o site em <strong>https://rede-servicos.web.app</strong> estará atualizado.</span>
+    </div>
+  </section>
+
+  <!-- Erro Git -->
+  <section id="erro-git">
+    <h2><span class="icon">⚠️</span> Erro de Credenciais do Git</h2>
+    <p>No Windows, ao fazer <span class="inline-code">git push</span> pela primeira vez em um computador novo, pode aparecer erro de autenticação. Corrija assim:</p>
+    <pre><code>git remote set-url origin https://victoralbertoms-wq:SEU_TOKEN@github.com/victoralbertoms-wq/rede-servicos-comunitarios.git</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+    <h3>Como gerar o token do GitHub</h3>
+    <ol style="padding-left:1.5rem; color:var(--text-muted); display:flex; flex-direction:column; gap:.4rem; margin-bottom:1rem;">
+      <li>Acesse <strong>github.com → Settings → Developer settings → Personal access tokens → Tokens (classic)</strong></li>
+      <li>Clique em <strong>"Generate new token (classic)"</strong></li>
+      <li>Marque os escopos: <span class="inline-code">repo</span> + <span class="inline-code">workflow</span></li>
+      <li>Copie o token gerado e substitua <span class="inline-code">SEU_TOKEN</span> no comando acima</li>
+    </ol>
+    <div class="alert alert-danger">
+      <span class="alert-icon">🔒</span>
+      <span>Guarde o token em local seguro. Ele aparece apenas uma vez no GitHub.</span>
+    </div>
+  </section>
+
+  <!-- Resumo -->
+  <section id="resumo">
+    <h2><span class="icon">⚡</span> Resumo em 4 Comandos</h2>
+    <div class="summary-box">
+      <h4>Do zero ao funcionando</h4>
+      <pre><code># 1. Clonar
+git clone https://github.com/victoralbertoms-wq/rede-servicos-comunitarios.git
+cd rede-servicos-comunitarios
+
+# 2. Criar web/.env com as credenciais (ver Passo 3 acima)
+
+# 3. Instalar e rodar
+cd web && npm install && npm run dev
+
+# 4. Para publicar mudanças
+git add . && git commit -m "mudança" && git push</code></pre>
+    </div>
+  </section>
+</main>
+
+<script>
+  function copyCode(btn) {
+    const pre = btn.parentElement;
+    const code = pre.querySelector('code').innerText;
+    navigator.clipboard.writeText(code).then(() => {
+      btn.textContent = 'Copiado!';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'Copiar'; btn.classList.remove('copied'); }, 2000);
+    });
+  }
+  const links = document.querySelectorAll('.nav-link');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const a = document.querySelector(`.nav-link[href="#${e.target.id}"]`);
+        if (a) a.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-40% 0px -55% 0px' });
+  document.querySelectorAll('section[id]').forEach(s => observer.observe(s));
+</script>
+</body>
+</html>

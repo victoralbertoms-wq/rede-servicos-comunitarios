@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manual do Sistema — Rede de Serviços Comunitários</title>
+<style>
+  :root {
+    --primary: #4f46e5;
+    --primary-light: #eef2ff;
+    --secondary: #0ea5e9;
+    --success: #22c55e;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --text: #1e293b;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
+    --bg: #f8fafc;
+    --white: #ffffff;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; }
+
+  /* Layout */
+  .sidebar { position: fixed; top: 0; left: 0; width: 260px; height: 100vh; background: var(--white); border-right: 1px solid var(--border); overflow-y: auto; padding: 2rem 0; z-index: 100; }
+  .sidebar-logo { padding: 0 1.5rem 1.5rem; border-bottom: 1px solid var(--border); margin-bottom: 1rem; }
+  .sidebar-logo h2 { font-size: .85rem; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: .05em; }
+  .sidebar-logo p { font-size: .75rem; color: var(--text-muted); margin-top: .2rem; }
+  .nav-group { padding: .5rem 1.5rem; }
+  .nav-group-title { font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--text-muted); margin-bottom: .4rem; }
+  .nav-link { display: block; padding: .4rem .75rem; border-radius: 6px; text-decoration: none; font-size: .85rem; color: var(--text-muted); transition: all .15s; margin-bottom: .1rem; }
+  .nav-link:hover, .nav-link.active { background: var(--primary-light); color: var(--primary); font-weight: 600; }
+  .content { margin-left: 260px; padding: 3rem 4rem; max-width: 1100px; }
+
+  /* Header */
+  .page-header { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; padding: 3rem; border-radius: 16px; margin-bottom: 3rem; }
+  .page-header .badge { display: inline-block; background: rgba(255,255,255,.2); padding: .3rem .8rem; border-radius: 100px; font-size: .75rem; font-weight: 600; margin-bottom: 1rem; letter-spacing: .05em; text-transform: uppercase; }
+  .page-header h1 { font-size: 2.2rem; font-weight: 800; margin-bottom: .5rem; }
+  .page-header p { opacity: .85; font-size: 1.05rem; }
+
+  /* Sections */
+  section { margin-bottom: 3rem; scroll-margin-top: 2rem; }
+  h2 { font-size: 1.35rem; font-weight: 700; color: var(--text); margin-bottom: 1.25rem; padding-bottom: .6rem; border-bottom: 2px solid var(--border); display: flex; align-items: center; gap: .5rem; }
+  h2 .icon { width: 32px; height: 32px; background: var(--primary-light); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1rem; }
+  h3 { font-size: 1rem; font-weight: 700; margin: 1.5rem 0 .75rem; color: var(--primary); }
+  p { margin-bottom: .75rem; color: var(--text-muted); }
+
+  /* Cards */
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+  .card { background: var(--white); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; }
+  .card-icon { font-size: 1.5rem; margin-bottom: .5rem; }
+  .card h4 { font-size: .9rem; font-weight: 700; margin-bottom: .25rem; }
+  .card p { font-size: .8rem; margin: 0; }
+
+  /* Tables */
+  .table-wrap { overflow-x: auto; margin-bottom: 1.5rem; }
+  table { width: 100%; border-collapse: collapse; font-size: .88rem; }
+  th { background: var(--primary); color: white; padding: .75rem 1rem; text-align: left; font-weight: 600; }
+  th:first-child { border-radius: 8px 0 0 0; }
+  th:last-child { border-radius: 0 8px 0 0; }
+  td { padding: .7rem 1rem; border-bottom: 1px solid var(--border); }
+  tr:last-child td { border-bottom: none; }
+  tr:nth-child(even) td { background: var(--bg); }
+  .check { color: var(--success); font-weight: 700; }
+  .cross { color: #cbd5e1; }
+
+  /* Code */
+  pre { background: #1e293b; color: #e2e8f0; padding: 1.25rem 1.5rem; border-radius: 10px; overflow-x: auto; font-size: .82rem; line-height: 1.6; margin-bottom: 1rem; }
+  code { font-family: 'Cascadia Code', 'Fira Code', monospace; }
+  .inline-code { background: var(--primary-light); color: var(--primary); padding: .1rem .4rem; border-radius: 4px; font-size: .85em; font-family: monospace; }
+
+  /* Flow */
+  .flow { display: flex; flex-direction: column; gap: 0; max-width: 400px; }
+  .flow-step { display: flex; align-items: center; gap: 1rem; }
+  .flow-box { background: var(--white); border: 2px solid var(--border); border-radius: 10px; padding: .75rem 1.25rem; font-size: .88rem; font-weight: 600; flex: 1; }
+  .flow-box.highlight { border-color: var(--primary); background: var(--primary-light); color: var(--primary); }
+  .flow-arrow { text-align: center; color: var(--text-muted); font-size: 1.2rem; padding: .2rem 0; }
+
+  /* Status badges */
+  .badge { display: inline-block; padding: .2rem .6rem; border-radius: 100px; font-size: .75rem; font-weight: 600; }
+  .badge-pending { background: #fef3c7; color: #92400e; }
+  .badge-approved { background: #dcfce7; color: #166534; }
+  .badge-rejected { background: #fee2e2; color: #991b1b; }
+
+  @media (max-width: 768px) {
+    .sidebar { display: none; }
+    .content { margin-left: 0; padding: 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <h2>📋 Manual do Sistema</h2>
+    <p>Rede de Serviços Comunitários</p>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-title">Visão Geral</div>
+    <a href="#sobre" class="nav-link">O que é o sistema</a>
+    <a href="#tecnologias" class="nav-link">Tecnologias</a>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-title">Funcionalidades</div>
+    <a href="#autenticacao" class="nav-link">Autenticação</a>
+    <a href="#comunidades" class="nav-link">Comunidades</a>
+    <a href="#servicos" class="nav-link">Serviços</a>
+    <a href="#empresas" class="nav-link">Empresas</a>
+    <a href="#avaliacoes" class="nav-link">Avaliações</a>
+    <a href="#mensagens" class="nav-link">Mensagens</a>
+    <a href="#admin" class="nav-link">Painel Admin</a>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-title">Estrutura</div>
+    <a href="#aprovacao" class="nav-link">Fluxo de Aprovação</a>
+    <a href="#permissoes" class="nav-link">Permissões</a>
+    <a href="#dados" class="nav-link">Estrutura de Dados</a>
+    <a href="#imagens" class="nav-link">Imagens</a>
+    <a href="#url" class="nav-link">URL do Sistema</a>
+  </div>
+</nav>
+
+<main class="content">
+  <div class="page-header">
+    <div class="badge">📄 Documentação</div>
+    <h1>Manual Descritivo do Sistema</h1>
+    <p>Rede de Serviços Comunitários — Guia completo de funcionalidades e estrutura</p>
+  </div>
+
+  <!-- Sobre -->
+  <section id="sobre">
+    <h2><span class="icon">💡</span> O que é o sistema</h2>
+    <p>A <strong>Rede de Serviços Comunitários</strong> é uma plataforma digital que conecta membros de comunidades a profissionais e empresas locais. Funciona como um diretório comunitário onde qualquer pessoa pode cadastrar seus serviços ou empresa, participar de comunidades e encontrar o que precisa.</p>
+    <div class="cards">
+      <div class="card">
+        <div class="card-icon">🌐</div>
+        <h4>Versão Web</h4>
+        <p>Acessível por navegador em qualquer computador</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">📱</div>
+        <h4>Versão Mobile</h4>
+        <p>Aplicativo para Android e iOS via Expo Go</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">☁️</div>
+        <h4>100% na Nuvem</h4>
+        <p>Banco de dados e imagens armazenados online</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔒</div>
+        <h4>Autenticado</h4>
+        <p>Somente usuários cadastrados acessam o sistema</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tecnologias -->
+  <section id="tecnologias">
+    <h2><span class="icon">⚙️</span> Tecnologias</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Camada</th><th>Tecnologia</th><th>Finalidade</th></tr></thead>
+        <tbody>
+          <tr><td>Web (frontend)</td><td>React 18 + Vite</td><td>Interface do usuário no navegador</td></tr>
+          <tr><td>Mobile</td><td>React Native + Expo SDK 50</td><td>App para Android e iOS</td></tr>
+          <tr><td>Banco de dados</td><td>Firebase Firestore</td><td>Armazenamento de todos os dados</td></tr>
+          <tr><td>Autenticação</td><td>Firebase Authentication</td><td>Login, cadastro, sessão</td></tr>
+          <tr><td>Hospedagem web</td><td>Firebase Hosting</td><td>Publicação do site em produção</td></tr>
+          <tr><td>Imagens</td><td>Cloudinary (gratuito)</td><td>Upload e armazenamento de fotos</td></tr>
+          <tr><td>CI/CD</td><td>GitHub Actions</td><td>Deploy automático a cada git push</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Autenticação -->
+  <section id="autenticacao">
+    <h2><span class="icon">🔐</span> Autenticação</h2>
+    <div class="cards">
+      <div class="card"><div class="card-icon">📧</div><h4>Cadastro</h4><p>Novo usuário com e-mail e senha</p></div>
+      <div class="card"><div class="card-icon">🔑</div><h4>Login / Logout</h4><p>Acesso com e-mail e senha cadastrados</p></div>
+      <div class="card"><div class="card-icon">🔄</div><h4>Recuperação</h4><p>Redefinição de senha por e-mail</p></div>
+    </div>
+  </section>
+
+  <!-- Comunidades -->
+  <section id="comunidades">
+    <h2><span class="icon">🏘️</span> Comunidades</h2>
+    <ul style="list-style:none; display:flex; flex-direction:column; gap:.5rem;">
+      <li>✅ Listar todas as comunidades ativas com busca</li>
+      <li>✅ Criar nova comunidade (apenas admin global)</li>
+      <li>✅ Ver detalhe com seus serviços e empresas separados por aba</li>
+      <li>✅ Editar nome, descrição, senha, logo e foto de capa (criador ou admin)</li>
+      <li>✅ Remover logo ou foto de capa individualmente</li>
+      <li>✅ Excluir comunidade (criador ou admin)</li>
+      <li>✅ Entrar em comunidade com ou sem senha</li>
+      <li>✅ Cadastrar serviço/empresa diretamente vinculado à comunidade</li>
+    </ul>
+  </section>
+
+  <!-- Serviços -->
+  <section id="servicos">
+    <h2><span class="icon">🔧</span> Serviços</h2>
+    <ul style="list-style:none; display:flex; flex-direction:column; gap:.5rem;">
+      <li>✅ Listar serviços aprovados com busca por nome, categoria, cidade</li>
+      <li>✅ Filtro por categoria</li>
+      <li>✅ Cadastrar novo serviço (qualquer usuário autenticado)</li>
+      <li>✅ Ver detalhe completo: foto, contatos, avaliações, localização</li>
+      <li>✅ Editar serviço — todos os campos + foto (dono ou admin)</li>
+      <li>✅ Remover foto sem precisar enviar nova</li>
+      <li>✅ Excluir serviço (dono ou admin)</li>
+      <li>✅ Favoritar serviço</li>
+      <li>✅ Entrar em contato por telefone, WhatsApp, e-mail, site</li>
+    </ul>
+    <h3>Categorias disponíveis</h3>
+    <p>Construção Civil · Elétrica · Hidráulica · Advocacia · Contabilidade · Saúde · Psicologia · Educação · Mecânica · Tecnologia · Beleza & Estética · Gastronomia · Transporte · Outros</p>
+  </section>
+
+  <!-- Empresas -->
+  <section id="empresas">
+    <h2><span class="icon">🏢</span> Empresas</h2>
+    <ul style="list-style:none; display:flex; flex-direction:column; gap:.5rem;">
+      <li>✅ Listar empresas aprovadas com busca e filtro por categoria</li>
+      <li>✅ Cadastrar nova empresa com CNPJ, razão social, logo e foto</li>
+      <li>✅ Ver detalhe completo: logo, foto de capa, contatos, avaliações</li>
+      <li>✅ Editar empresa — todos os campos (dono ou admin)</li>
+      <li>✅ Remover logo ou foto de capa individualmente</li>
+      <li>✅ Excluir empresa (dono ou admin)</li>
+    </ul>
+  </section>
+
+  <!-- Avaliações -->
+  <section id="avaliacoes">
+    <h2><span class="icon">⭐</span> Avaliações</h2>
+    <p>Qualquer usuário autenticado pode avaliar serviços e empresas com nota de 1 a 5 estrelas e comentário. A média é calculada automaticamente e exibida no card e na página de detalhe.</p>
+  </section>
+
+  <!-- Mensagens -->
+  <section id="mensagens">
+    <h2><span class="icon">💬</span> Mensagens</h2>
+    <p>Chat direto entre usuários, acessível pelo botão "Mensagem" na página de qualquer serviço ou empresa. Conversas ficam salvas no Firestore.</p>
+  </section>
+
+  <!-- Admin -->
+  <section id="admin">
+    <h2><span class="icon">🛡️</span> Painel Administrativo</h2>
+    <p>Acessível apenas por usuários com <span class="inline-code">role: "admin"</span> na rota <span class="inline-code">/admin</span>.</p>
+    <div class="cards">
+      <div class="card"><div class="card-icon">📊</div><h4>Estatísticas</h4><p>Total de usuários, comunidades, serviços, empresas e avaliações</p></div>
+      <div class="card"><div class="card-icon">✔️</div><h4>Aprovações</h4><p>Aprovar ou rejeitar serviços e empresas pendentes</p></div>
+      <div class="card"><div class="card-icon">👥</div><h4>Usuários</h4><p>Gerenciar papel de cada usuário (admin / usuário)</p></div>
+      <div class="card"><div class="card-icon">🏘️</div><h4>Comunidades</h4><p>Gerenciar todas as comunidades do sistema</p></div>
+    </div>
+  </section>
+
+  <!-- Aprovação -->
+  <section id="aprovacao">
+    <h2><span class="icon">🔄</span> Fluxo de Aprovação</h2>
+    <p>Serviços e empresas passam por aprovação antes de aparecer publicamente:</p>
+    <div class="flow" style="margin: 1.5rem 0;">
+      <div class="flow-step"><div class="flow-box">Usuário cadastra serviço/empresa</div></div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step"><div class="flow-box"><span class="badge badge-pending">pending</span> &nbsp; Aguardando aprovação</div></div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step"><div class="flow-box">Admin acessa /admin e aprova</div></div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step"><div class="flow-box highlight"><span class="badge badge-approved">approved</span> &nbsp; Aparece na listagem pública</div></div>
+    </div>
+    <p><strong>Nota:</strong> O próprio dono do cadastro sempre vê seu item, mesmo enquanto pendente.</p>
+  </section>
+
+  <!-- Permissões -->
+  <section id="permissoes">
+    <h2><span class="icon">🔒</span> Permissões por Tipo de Usuário</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Ação</th><th>Visitante</th><th>Usuário</th><th>Dono do cadastro</th><th>Admin</th></tr></thead>
+        <tbody>
+          <tr><td>Ver listagens</td><td class="cross">✗</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td></tr>
+          <tr><td>Cadastrar serviço/empresa</td><td class="cross">✗</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td></tr>
+          <tr><td>Editar próprio serviço/empresa</td><td class="cross">✗</td><td class="cross">✗</td><td class="check">✓</td><td class="check">✓</td></tr>
+          <tr><td>Excluir próprio serviço/empresa</td><td class="cross">✗</td><td class="cross">✗</td><td class="check">✓</td><td class="check">✓</td></tr>
+          <tr><td>Criar comunidade</td><td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td><td class="check">✓</td></tr>
+          <tr><td>Editar comunidade</td><td class="cross">✗</td><td class="cross">✗</td><td class="check">✓ (se adminIds)</td><td class="check">✓</td></tr>
+          <tr><td>Aprovar cadastros</td><td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td><td class="check">✓</td></tr>
+          <tr><td>Gerenciar usuários</td><td class="cross">✗</td><td class="cross">✗</td><td class="cross">✗</td><td class="check">✓</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Dados -->
+  <section id="dados">
+    <h2><span class="icon">🗄️</span> Estrutura de Dados (Firestore)</h2>
+    <h3>Coleção: users</h3>
+    <pre><code>{
+  displayName: string,
+  email: string,
+  photoURL: string,
+  role: 'user' | 'admin',
+  communityId: string,
+  favorites: { services: [], companies: [] },
+  createdAt: timestamp
+}</code></pre>
+    <h3>Coleção: communities</h3>
+    <pre><code>{
+  name: string,
+  description: string,
+  password: string,       // vazio = comunidade aberta
+  logoURL: string,
+  photoURL: string,
+  adminIds: [uid],        // quem pode editar/excluir
+  memberCount: number,
+  isActive: boolean,
+  createdAt: timestamp
+}</code></pre>
+    <h3>Coleção: services</h3>
+    <pre><code>{
+  name, category, specialty, description,
+  phone, whatsapp, email, website, instagram, facebook,
+  city, state, address, workingHours,
+  photoURL: string,
+  communityId: string,
+  userId: string,         // dono do cadastro
+  status: 'pending' | 'approved' | 'rejected',
+  rating: number,
+  reviewCount: number,
+  createdAt: timestamp
+}</code></pre>
+    <h3>Coleção: reviews</h3>
+    <pre><code>{
+  targetId: string,       // id do serviço ou empresa
+  targetType: 'service' | 'company',
+  userId, userName,
+  rating: number,         // 1 a 5
+  comment: string,
+  createdAt: timestamp
+}</code></pre>
+  </section>
+
+  <!-- Imagens -->
+  <section id="imagens">
+    <h2><span class="icon">🖼️</span> Armazenamento de Imagens</h2>
+    <p>Todas as imagens são enviadas para o <strong>Cloudinary</strong>, serviço gratuito de armazenamento de mídia na nuvem.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Configuração</th><th>Valor</th></tr></thead>
+        <tbody>
+          <tr><td>Cloud name</td><td><span class="inline-code">dh3v2u54h</span></td></tr>
+          <tr><td>Upload preset</td><td><span class="inline-code">rede-servicos</span> (modo Unsigned)</td></tr>
+          <tr><td>Console</td><td>cloudinary.com/console</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>⚠️ Imagens ficam permanentemente no Cloudinary mesmo se o registro for excluído do Firestore.</p>
+  </section>
+
+  <!-- URL -->
+  <section id="url">
+    <h2><span class="icon">🔗</span> URLs do Sistema</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Ambiente</th><th>URL</th></tr></thead>
+        <tbody>
+          <tr><td>Produção (web)</td><td><span class="inline-code">https://rede-servicos.web.app</span></td></tr>
+          <tr><td>Repositório</td><td><span class="inline-code">https://github.com/victoralbertoms-wq/rede-servicos-comunitarios</span></td></tr>
+          <tr><td>Firebase Console</td><td><span class="inline-code">https://console.firebase.google.com/project/rede-servicos</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<script>
+  const links = document.querySelectorAll('.nav-link');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const active = document.querySelector(`.nav-link[href="#${e.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-40% 0px -55% 0px' });
+  document.querySelectorAll('section[id]').forEach(s => observer.observe(s));
+  links.forEach(l => l.addEventListener('click', e => {
+    links.forEach(x => x.classList.remove('active'));
+    e.currentTarget.classList.add('active');
+  }));
+</script>
+</body>
+</html>

@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Documentação — Rede de Serviços Comunitários</title>
+<style>
+  :root {
+    --primary: #4f46e5;
+    --primary-light: #eef2ff;
+    --secondary: #0ea5e9;
+    --success: #22c55e;
+    --warning: #f59e0b;
+    --text: #1e293b;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
+    --bg: #f8fafc;
+    --white: #ffffff;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  /* Hero */
+  .hero { background: linear-gradient(135deg, #4f46e5 0%, #0ea5e9 50%, #22c55e 100%); color: white; padding: 5rem 2rem 4rem; text-align: center; position: relative; overflow: hidden; }
+  .hero::before { content: ''; position: absolute; inset: 0; background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='4'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E"); }
+  .hero-content { position: relative; z-index: 1; max-width: 700px; margin: 0 auto; }
+  .hero-logo { width: 72px; height: 72px; background: rgba(255,255,255,.2); border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto 1.5rem; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,.3); }
+  .hero h1 { font-size: 2.5rem; font-weight: 800; margin-bottom: .75rem; }
+  .hero p { font-size: 1.1rem; opacity: .85; margin-bottom: 2rem; }
+  .hero-badges { display: flex; gap: .75rem; justify-content: center; flex-wrap: wrap; }
+  .hero-badge { background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.25); padding: .35rem .9rem; border-radius: 100px; font-size: .8rem; font-weight: 600; backdrop-filter: blur(10px); }
+
+  /* Content */
+  .container { max-width: 1100px; margin: 0 auto; padding: 4rem 2rem; }
+
+  /* Section */
+  .section-title { font-size: 1.1rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: .1em; margin-bottom: 1.5rem; }
+
+  /* Manual cards */
+  .manuals { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 4rem; }
+  .manual-card { background: var(--white); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; text-decoration: none; color: inherit; transition: all .2s; display: flex; flex-direction: column; }
+  .manual-card:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(0,0,0,.1); border-color: transparent; }
+  .manual-card-header { padding: 2rem; display: flex; align-items: flex-start; gap: 1.25rem; }
+  .manual-icon { width: 56px; height: 56px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; flex-shrink: 0; }
+  .manual-card h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: .35rem; }
+  .manual-card p { font-size: .875rem; color: var(--text-muted); line-height: 1.6; margin: 0; }
+  .manual-card-footer { padding: 1rem 2rem; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; margin-top: auto; }
+  .manual-card-footer span { font-size: .8rem; color: var(--text-muted); }
+  .manual-card-footer .arrow { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: .9rem; transition: all .2s; }
+  .manual-card:hover .arrow { transform: translateX(3px); }
+
+  /* Color themes */
+  .theme-purple .manual-icon { background: #f5f3ff; }
+  .theme-purple .manual-card-footer .arrow { background: #f5f3ff; color: #7c3aed; }
+  .theme-purple:hover { border-color: #7c3aed; }
+
+  .theme-blue .manual-icon { background: #eff6ff; }
+  .theme-blue .manual-card-footer .arrow { background: #eff6ff; color: #2563eb; }
+  .theme-blue:hover { border-color: #2563eb; }
+
+  .theme-green .manual-icon { background: #f0fdf4; }
+  .theme-green .manual-card-footer .arrow { background: #f0fdf4; color: #16a34a; }
+  .theme-green:hover { border-color: #16a34a; }
+
+  .theme-orange .manual-icon { background: #fff7ed; }
+  .theme-orange .manual-card-footer .arrow { background: #fff7ed; color: #ea580c; }
+  .theme-orange:hover { border-color: #ea580c; }
+
+  /* Quick ref */
+  .quick-ref { background: #1e293b; border-radius: 16px; padding: 2rem; margin-bottom: 4rem; }
+  .quick-ref h2 { color: #f1f5f9; font-size: 1.1rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: .5rem; }
+  .commands { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem; }
+  .command { background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1); border-radius: 10px; padding: 1rem 1.25rem; }
+  .command-label { font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: #64748b; margin-bottom: .4rem; }
+  .command code { font-family: 'Cascadia Code', 'Fira Code', monospace; font-size: .82rem; color: #a5f3fc; display: block; }
+
+  /* Links section */
+  .links-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; }
+  .link-card { background: var(--white); border: 1px solid var(--border); border-radius: 12px; padding: 1.1rem 1.25rem; display: flex; align-items: center; gap: .85rem; text-decoration: none; color: inherit; transition: all .15s; }
+  .link-card:hover { border-color: var(--primary); background: var(--primary-light); }
+  .link-card .lc-icon { font-size: 1.3rem; }
+  .link-card h4 { font-size: .88rem; font-weight: 700; margin-bottom: .1rem; }
+  .link-card p { font-size: .75rem; color: var(--text-muted); margin: 0; }
+
+  /* Footer */
+  footer { text-align: center; padding: 2rem; border-top: 1px solid var(--border); color: var(--text-muted); font-size: .85rem; }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-content">
+    <div class="hero-logo">🌐</div>
+    <h1>Rede de Serviços Comunitários</h1>
+    <p>Central de documentação do sistema — manuais, referências e guias de instalação</p>
+    <div class="hero-badges">
+      <span class="hero-badge">React 18 + Vite</span>
+      <span class="hero-badge">Firebase Firestore</span>
+      <span class="hero-badge">Cloudinary</span>
+      <span class="hero-badge">Expo SDK 50</span>
+      <span class="hero-badge">GitHub Actions</span>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- Manuais -->
+  <p class="section-title">📚 Manuais</p>
+  <div class="manuals">
+
+    <a href="manual-sistema.html" class="manual-card theme-purple">
+      <div class="manual-card-header">
+        <div class="manual-icon">📋</div>
+        <div>
+          <h3>Manual do Sistema</h3>
+          <p>O que o sistema faz, funcionalidades completas, permissões por usuário, estrutura de dados Firestore e fluxo de aprovação.</p>
+        </div>
+      </div>
+      <div class="manual-card-footer">
+        <span>Funcionalidades · Permissões · Dados</span>
+        <div class="arrow">→</div>
+      </div>
+    </a>
+
+    <a href="manual-instalacao.html" class="manual-card theme-green">
+      <div class="manual-card-header">
+        <div class="manual-icon">🛠️</div>
+        <div>
+          <h3>Manual de Instalação</h3>
+          <p>Pré-requisitos, configuração das variáveis de ambiente, Firebase CLI, GitHub Actions e como tornar um usuário admin.</p>
+        </div>
+      </div>
+      <div class="manual-card-footer">
+        <span>Instalação · CI/CD · Firebase</span>
+        <div class="arrow">→</div>
+      </div>
+    </a>
+
+    <a href="manual-novo-computador.html" class="manual-card theme-blue">
+      <div class="manual-card-header">
+        <div class="manual-icon">💻</div>
+        <div>
+          <h3>Novo Computador</h3>
+          <p>Passo a passo simplificado para colocar o projeto rodando em qualquer máquina nova em poucos minutos.</p>
+        </div>
+      </div>
+      <div class="manual-card-footer">
+        <span>Clone · .env · npm install · rodar</span>
+        <div class="arrow">→</div>
+      </div>
+    </a>
+
+    <a href="referencia-claude.html" class="manual-card theme-orange">
+      <div class="manual-card-header">
+        <div class="manual-icon">🤖</div>
+        <div>
+          <h3>Referência Técnica</h3>
+          <p>Credenciais, decisões de arquitetura, rotas, comandos rápidos e tudo que o Claude Code precisa saber sobre o projeto.</p>
+        </div>
+      </div>
+      <div class="manual-card-footer">
+        <span>Credenciais · Arquitetura · Rotas</span>
+        <div class="arrow">→</div>
+      </div>
+    </a>
+
+  </div>
+
+  <!-- Quick ref -->
+  <div class="quick-ref">
+    <h2>⚡ Comandos Rápidos</h2>
+    <div class="commands">
+      <div class="command">
+        <div class="command-label">Rodar web local</div>
+        <code>cd web &amp;&amp; npm run dev</code>
+      </div>
+      <div class="command">
+        <div class="command-label">Rodar mobile</div>
+        <code>cd mobile &amp;&amp; npx expo start</code>
+      </div>
+      <div class="command">
+        <div class="command-label">Deploy (automático)</div>
+        <code>git add . &amp;&amp; git commit -m "msg" &amp;&amp; git push</code>
+      </div>
+      <div class="command">
+        <div class="command-label">Regras Firestore</div>
+        <code>cd firebase &amp;&amp; firebase deploy --only firestore:rules</code>
+      </div>
+      <div class="command">
+        <div class="command-label">Login Firebase CLI</div>
+        <code>firebase login</code>
+      </div>
+      <div class="command">
+        <div class="command-label">Build produção</div>
+        <code>cd web &amp;&amp; npm run build</code>
+      </div>
+    </div>
+  </div>
+
+  <!-- Links externos -->
+  <p class="section-title">🔗 Links Úteis</p>
+  <div class="links-grid">
+    <a href="https://rede-servicos.web.app" target="_blank" class="link-card">
+      <div class="lc-icon">🌐</div>
+      <div><h4>Site em Produção</h4><p>rede-servicos.web.app</p></div>
+    </a>
+    <a href="https://github.com/victoralbertoms-wq/rede-servicos-comunitarios" target="_blank" class="link-card">
+      <div class="lc-icon">🐙</div>
+      <div><h4>Repositório GitHub</h4><p>Código-fonte do projeto</p></div>
+    </a>
+    <a href="https://console.firebase.google.com/project/rede-servicos" target="_blank" class="link-card">
+      <div class="lc-icon">🔥</div>
+      <div><h4>Firebase Console</h4><p>Banco de dados e auth</p></div>
+    </a>
+    <a href="https://cloudinary.com/console" target="_blank" class="link-card">
+      <div class="lc-icon">🖼️</div>
+      <div><h4>Cloudinary</h4><p>Gerenciar imagens</p></div>
+    </a>
+    <a href="https://github.com/victoralbertoms-wq/rede-servicos-comunitarios/actions" target="_blank" class="link-card">
+      <div class="lc-icon">⚙️</div>
+      <div><h4>GitHub Actions</h4><p>Status do deploy</p></div>
+    </a>
+    <a href="https://github.com/victoralbertoms-wq/rede-servicos-comunitarios/settings/secrets/actions" target="_blank" class="link-card">
+      <div class="lc-icon">🔑</div>
+      <div><h4>Secrets GitHub</h4><p>Variáveis de ambiente CI</p></div>
+    </a>
+  </div>
+
+</div>
+
+<footer>
+  Rede de Serviços Comunitários &mdash; Documentação interna &mdash; 2026
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manual de Instalação — Rede de Serviços Comunitários</title>
+<style>
+  :root {
+    --primary: #4f46e5;
+    --primary-light: #eef2ff;
+    --secondary: #0ea5e9;
+    --success: #22c55e;
+    --success-light: #dcfce7;
+    --warning: #f59e0b;
+    --warning-light: #fef3c7;
+    --danger: #ef4444;
+    --text: #1e293b;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
+    --bg: #f8fafc;
+    --white: #ffffff;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; }
+
+  .sidebar { position: fixed; top: 0; left: 0; width: 260px; height: 100vh; background: var(--white); border-right: 1px solid var(--border); overflow-y: auto; padding: 2rem 0; z-index: 100; }
+  .sidebar-logo { padding: 0 1.5rem 1.5rem; border-bottom: 1px solid var(--border); margin-bottom: 1rem; }
+  .sidebar-logo h2 { font-size: .85rem; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: .05em; }
+  .sidebar-logo p { font-size: .75rem; color: var(--text-muted); margin-top: .2rem; }
+  .nav-group { padding: .5rem 1.5rem; }
+  .nav-group-title { font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--text-muted); margin-bottom: .4rem; }
+  .nav-link { display: block; padding: .4rem .75rem; border-radius: 6px; text-decoration: none; font-size: .85rem; color: var(--text-muted); transition: all .15s; margin-bottom: .1rem; }
+  .nav-link:hover, .nav-link.active { background: var(--primary-light); color: var(--primary); font-weight: 600; }
+  .content { margin-left: 260px; padding: 3rem 4rem; max-width: 1100px; }
+
+  .page-header { background: linear-gradient(135deg, #059669, #0ea5e9); color: white; padding: 3rem; border-radius: 16px; margin-bottom: 3rem; }
+  .page-header .badge { display: inline-block; background: rgba(255,255,255,.2); padding: .3rem .8rem; border-radius: 100px; font-size: .75rem; font-weight: 600; margin-bottom: 1rem; letter-spacing: .05em; text-transform: uppercase; }
+  .page-header h1 { font-size: 2.2rem; font-weight: 800; margin-bottom: .5rem; }
+  .page-header p { opacity: .85; font-size: 1.05rem; }
+
+  section { margin-bottom: 3rem; scroll-margin-top: 2rem; }
+  h2 { font-size: 1.35rem; font-weight: 700; color: var(--text); margin-bottom: 1.25rem; padding-bottom: .6rem; border-bottom: 2px solid var(--border); display: flex; align-items: center; gap: .5rem; }
+  h2 .icon { width: 32px; height: 32px; background: var(--primary-light); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1rem; }
+  h3 { font-size: 1rem; font-weight: 700; margin: 1.5rem 0 .75rem; color: var(--primary); }
+  p { margin-bottom: .75rem; color: var(--text-muted); }
+
+  /* Steps */
+  .steps { display: flex; flex-direction: column; gap: 0; }
+  .step { display: flex; gap: 1.25rem; padding-bottom: 2rem; position: relative; }
+  .step:not(:last-child)::before { content: ''; position: absolute; left: 19px; top: 40px; width: 2px; height: calc(100% - 40px); background: var(--border); }
+  .step-num { width: 40px; height: 40px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: .9rem; flex-shrink: 0; z-index: 1; }
+  .step-body { flex: 1; }
+  .step-body h3 { margin-top: 0; font-size: 1.05rem; }
+  .step-body p { margin-bottom: .5rem; }
+
+  /* Alert boxes */
+  .alert { padding: 1rem 1.25rem; border-radius: 10px; margin-bottom: 1rem; display: flex; gap: .75rem; align-items: flex-start; font-size: .9rem; }
+  .alert-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: .05rem; }
+  .alert-info { background: var(--primary-light); border-left: 4px solid var(--primary); }
+  .alert-warning { background: var(--warning-light); border-left: 4px solid var(--warning); }
+  .alert-success { background: var(--success-light); border-left: 4px solid var(--success); }
+
+  /* Cards */
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+  .card { background: var(--white); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; }
+  .card-icon { font-size: 1.5rem; margin-bottom: .5rem; }
+  .card h4 { font-size: .9rem; font-weight: 700; margin-bottom: .25rem; }
+  .card p { font-size: .8rem; margin: 0; }
+  .card a { color: var(--primary); text-decoration: none; font-size: .8rem; }
+
+  /* Tables */
+  .table-wrap { overflow-x: auto; margin-bottom: 1.5rem; }
+  table { width: 100%; border-collapse: collapse; font-size: .88rem; }
+  th { background: var(--primary); color: white; padding: .75rem 1rem; text-align: left; font-weight: 600; }
+  th:first-child { border-radius: 8px 0 0 0; }
+  th:last-child { border-radius: 0 8px 0 0; }
+  td { padding: .7rem 1rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  tr:nth-child(even) td { background: var(--bg); }
+
+  /* Code */
+  pre { background: #1e293b; color: #e2e8f0; padding: 1.25rem 1.5rem; border-radius: 10px; overflow-x: auto; font-size: .82rem; line-height: 1.6; margin-bottom: 1rem; position: relative; }
+  code { font-family: 'Cascadia Code', 'Fira Code', monospace; }
+  .inline-code { background: var(--primary-light); color: var(--primary); padding: .1rem .4rem; border-radius: 4px; font-size: .85em; font-family: monospace; }
+
+  .copy-btn { position: absolute; top: .75rem; right: .75rem; background: rgba(255,255,255,.1); color: #94a3b8; border: 1px solid rgba(255,255,255,.15); border-radius: 6px; padding: .3rem .7rem; font-size: .75rem; cursor: pointer; transition: all .15s; }
+  .copy-btn:hover { background: rgba(255,255,255,.2); color: white; }
+  .copy-btn.copied { background: #22c55e; color: white; border-color: #22c55e; }
+
+  /* Summary box */
+  .summary-box { background: #1e293b; color: #e2e8f0; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; }
+  .summary-box h4 { color: #94a3b8; font-size: .75rem; text-transform: uppercase; letter-spacing: .1em; margin-bottom: 1rem; }
+  .summary-box pre { background: none; padding: 0; margin: 0; }
+
+  @media (max-width: 768px) {
+    .sidebar { display: none; }
+    .content { margin-left: 0; padding: 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <h2>🛠️ Instalação</h2>
+    <p>Rede de Serviços Comunitários</p>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-title">Início</div>
+    <a href="#prereqs" class="nav-link">Pré-requisitos</a>
+    <a href="#clonar" class="nav-link">1. Clonar repositório</a>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-title">Configuração</div>
+    <a href="#web" class="nav-link">2. Configurar Web</a>
+    <a href="#mobile" class="nav-link">3. Configurar Mobile</a>
+    <a href="#firebase" class="nav-link">4. Firebase CLI</a>
+    <a href="#cicd" class="nav-link">5. GitHub Actions</a>
+    <a href="#admin" class="nav-link">6. Tornar Admin</a>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-title">Referência</div>
+    <a href="#resumo" class="nav-link">Resumo de comandos</a>
+  </div>
+</nav>
+
+<main class="content">
+  <div class="page-header">
+    <div class="badge">🛠️ Instalação</div>
+    <h1>Manual de Instalação</h1>
+    <p>Guia completo para instalar e configurar a Rede de Serviços Comunitários do zero</p>
+  </div>
+
+  <!-- Pré-requisitos -->
+  <section id="prereqs">
+    <h2><span class="icon">📦</span> Pré-requisitos</h2>
+    <p>Instale os programas abaixo antes de começar:</p>
+    <div class="cards">
+      <div class="card">
+        <div class="card-icon">🟢</div>
+        <h4>Node.js 18+</h4>
+        <p>Runtime JavaScript</p>
+        <a href="https://nodejs.org" target="_blank">nodejs.org →</a>
+      </div>
+      <div class="card">
+        <div class="card-icon">🐙</div>
+        <h4>Git</h4>
+        <p>Controle de versão</p>
+        <a href="https://git-scm.com" target="_blank">git-scm.com →</a>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔥</div>
+        <h4>Firebase CLI</h4>
+        <p>Linha de comando Firebase</p>
+        <span style="font-size:.78rem;color:var(--text-muted);">via npm (ver abaixo)</span>
+      </div>
+      <div class="card">
+        <div class="card-icon">📱</div>
+        <h4>Expo CLI</h4>
+        <p>Só se for rodar o mobile</p>
+        <span style="font-size:.78rem;color:var(--text-muted);">via npm (ver abaixo)</span>
+      </div>
+    </div>
+
+    <p>Após instalar o Node.js, instale as CLIs:</p>
+    <pre><code>npm install -g firebase-tools
+npm install -g expo-cli   # só para mobile</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+    <p>Verifique se está tudo ok:</p>
+    <pre><code>node --version      # deve mostrar v18.x ou superior
+npm --version
+git --version
+firebase --version</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+  </section>
+
+  <!-- Clonar -->
+  <section id="clonar">
+    <h2><span class="icon">📥</span> 1. Clonar o Repositório</h2>
+    <pre><code>git clone https://github.com/victoralbertoms-wq/rede-servicos-comunitarios.git
+cd rede-servicos-comunitarios</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+  </section>
+
+  <!-- Web -->
+  <section id="web">
+    <h2><span class="icon">🌐</span> 2. Configurar a Web</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h3>Instalar dependências</h3>
+          <pre><code>cd web
+npm install</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h3>Criar arquivo <span class="inline-code">web/.env</span></h3>
+          <div class="alert alert-warning">
+            <span class="alert-icon">⚠️</span>
+            <span>O arquivo <strong>.env</strong> não vai para o GitHub (está no .gitignore). Deve ser criado manualmente em cada computador.</span>
+          </div>
+          <pre><code>VITE_FIREBASE_API_KEY=AIzaSyDzHsXE4jc8pvSwaDl171xVXbA_qqXBwf4
+VITE_FIREBASE_AUTH_DOMAIN=rede-servicos.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=rede-servicos
+VITE_FIREBASE_MESSAGING_SENDER_ID=1008910813540
+VITE_FIREBASE_APP_ID=1:1008910813540:web:5b7ce8485fa4b095c25271
+VITE_FIREBASE_MEASUREMENT_ID=
+VITE_CLOUDINARY_CLOUD_NAME=dh3v2u54h
+VITE_CLOUDINARY_UPLOAD_PRESET=rede-servicos</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h3>Rodar em desenvolvimento</h3>
+          <pre><code>npm run dev</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+          <div class="alert alert-success">
+            <span class="alert-icon">✅</span>
+            <span>Abra o navegador em <strong>http://localhost:3000</strong></span>
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <h3>Build de produção (opcional)</h3>
+          <pre><code>npm run build</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+          <p>Os arquivos ficam em <span class="inline-code">web/dist/</span>.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Mobile -->
+  <section id="mobile">
+    <h2><span class="icon">📱</span> 3. Configurar o Mobile</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h3>Instalar dependências</h3>
+          <pre><code>cd mobile
+npm install</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h3>Criar arquivo <span class="inline-code">mobile/.env</span></h3>
+          <pre><code>EXPO_PUBLIC_FIREBASE_API_KEY=AIzaSyDzHsXE4jc8pvSwaDl171xVXbA_qqXBwf4
+EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=rede-servicos.firebaseapp.com
+EXPO_PUBLIC_FIREBASE_PROJECT_ID=rede-servicos
+EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=1008910813540
+EXPO_PUBLIC_FIREBASE_APP_ID=1:1008910813540:web:5b7ce8485fa4b095c25271
+EXPO_PUBLIC_CLOUDINARY_CLOUD_NAME=dh3v2u54h
+EXPO_PUBLIC_CLOUDINARY_UPLOAD_PRESET=rede-servicos</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h3>Rodar o app</h3>
+          <pre><code>npx expo start</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+          <div class="alert alert-info">
+            <span class="alert-icon">📱</span>
+            <span>Escaneie o QR Code com o app <strong>Expo Go</strong> no celular (disponível na App Store e Play Store).</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Firebase -->
+  <section id="firebase">
+    <h2><span class="icon">🔥</span> 4. Firebase CLI</h2>
+    <h3>Autenticar no Firebase</h3>
+    <pre><code>firebase login</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+    <p>Vai abrir o navegador para login com a conta Google do projeto.</p>
+
+    <h3>Implantar regras do Firestore</h3>
+    <div class="alert alert-warning">
+      <span class="alert-icon">⚠️</span>
+      <span>Este comando precisa ser executado sempre que as regras do Firestore forem alteradas.</span>
+    </div>
+    <pre><code>cd firebase
+firebase deploy --only firestore:rules</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+    <h3>Deploy manual do site (opcional)</h3>
+    <p>O deploy é automático pelo GitHub Actions. Para deploy manual:</p>
+    <pre><code>cd web && npm run build
+cp -r dist ../firebase/dist
+cd ../firebase && firebase deploy --only hosting</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+  </section>
+
+  <!-- CI/CD -->
+  <section id="cicd">
+    <h2><span class="icon">⚙️</span> 5. GitHub Actions (CI/CD)</h2>
+    <p>Para que o deploy automático funcione, configure os <strong>Secrets</strong> no GitHub:</p>
+    <p>Acesse: <span class="inline-code">github.com/victoralbertoms-wq/rede-servicos-comunitarios → Settings → Secrets → Actions</span></p>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Secret</th><th>Valor</th></tr></thead>
+        <tbody>
+          <tr><td><span class="inline-code">FIREBASE_API_KEY</span></td><td>AIzaSyDzHsXE4jc8pvSwaDl171xVXbA_qqXBwf4</td></tr>
+          <tr><td><span class="inline-code">FIREBASE_AUTH_DOMAIN</span></td><td>rede-servicos.firebaseapp.com</td></tr>
+          <tr><td><span class="inline-code">FIREBASE_PROJECT_ID</span></td><td>rede-servicos</td></tr>
+          <tr><td><span class="inline-code">FIREBASE_MESSAGING_SENDER_ID</span></td><td>1008910813540</td></tr>
+          <tr><td><span class="inline-code">FIREBASE_APP_ID</span></td><td>1:1008910813540:web:5b7ce8485fa4b095c25271</td></tr>
+          <tr><td><span class="inline-code">FIREBASE_MEASUREMENT_ID</span></td><td>(deixar vazio)</td></tr>
+          <tr><td><span class="inline-code">CLOUDINARY_CLOUD_NAME</span></td><td>dh3v2u54h</td></tr>
+          <tr><td><span class="inline-code">CLOUDINARY_UPLOAD_PRESET</span></td><td>rede-servicos</td></tr>
+          <tr><td><span class="inline-code">FIREBASE_TOKEN</span></td><td>gerado com <span class="inline-code">firebase login:ci</span></td></tr>
+          <tr><td><span class="inline-code">FIREBASE_SERVICE_ACCOUNT</span></td><td>JSON da conta de serviço Firebase</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Gerar FIREBASE_TOKEN</h3>
+    <pre><code>firebase login:ci</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+    <p>Copie o token exibido e adicione como secret <span class="inline-code">FIREBASE_TOKEN</span>.</p>
+
+    <h3>Gerar FIREBASE_SERVICE_ACCOUNT</h3>
+    <ol style="padding-left:1.5rem; color:var(--text-muted); display:flex; flex-direction:column; gap:.4rem;">
+      <li>Acesse Firebase Console → Configurações do projeto → Contas de serviço</li>
+      <li>Clique em "Gerar nova chave privada"</li>
+      <li>Copie o conteúdo do JSON e cole no secret</li>
+    </ol>
+  </section>
+
+  <!-- Admin -->
+  <section id="admin">
+    <h2><span class="icon">🛡️</span> 6. Tornar Usuário Admin</h2>
+    <p>Após criar a primeira conta no sistema:</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body"><p>Acesse o <strong>Firebase Console</strong> → Firestore Database → coleção <span class="inline-code">users</span></p></div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body"><p>Abra o documento do seu usuário</p></div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body"><p>Edite o campo <span class="inline-code">role</span> para <span class="inline-code">"admin"</span> e salve</p></div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <div class="alert alert-success">
+            <span class="alert-icon">✅</span>
+            <span>Agora você terá acesso ao Painel Admin em <strong>/admin</strong></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Resumo -->
+  <section id="resumo">
+    <h2><span class="icon">⚡</span> Resumo de Comandos</h2>
+    <div class="summary-box">
+      <h4>Todos os comandos em sequência</h4>
+      <pre><code># Clonar
+git clone https://github.com/victoralbertoms-wq/rede-servicos-comunitarios.git
+cd rede-servicos-comunitarios
+
+# Web — criar web/.env com as credenciais, depois:
+cd web && npm install && npm run dev
+
+# Mobile — criar mobile/.env com as credenciais, depois:
+cd mobile && npm install && npx expo start
+
+# Regras Firestore
+cd firebase && firebase deploy --only firestore:rules
+
+# Publicar mudanças (deploy automático)
+git add . && git commit -m "mensagem" && git push</code></pre>
+    </div>
+  </section>
+</main>
+
+<script>
+  function copyCode(btn) {
+    const pre = btn.parentElement;
+    const code = pre.querySelector('code').innerText;
+    navigator.clipboard.writeText(code).then(() => {
+      btn.textContent = 'Copiado!';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'Copiar'; btn.classList.remove('copied'); }, 2000);
+    });
+  }
+  const links = document.querySelectorAll('.nav-link');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const a = document.querySelector(`.nav-link[href="#${e.target.id}"]`);
+        if (a) a.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-40% 0px -55% 0px' });
+  document.querySelectorAll('section[id]').forEach(s => observer.observe(s));
+</script>
+</body>
+</html>
