@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { View, Text, ScrollView, TouchableOpacity, Linking, StyleSheet, Alert } from 'react-native'
+import { View, Text, ScrollView, TouchableOpacity, Linking, Image, StyleSheet, Alert, TextInput } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { getService, getReviews, addReview, toggleFavorite } from '../../services/firestoreService'
 import { useAuth } from '../../contexts/AuthContext'
@@ -19,7 +19,7 @@ function Stars({ value, onChange, size = 24 }) {
 
 export default function ServiceDetailScreen({ route, navigation }) {
   const { id } = route.params
-  const { user, userProfile } = useAuth()
+  const { user, userProfile, isAdmin } = useAuth()
   const [service, setService] = useState(null)
   const [reviews, setReviews] = useState([])
   const [isFav, setIsFav] = useState(false)
@@ -60,7 +60,10 @@ export default function ServiceDetailScreen({ route, navigation }) {
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       {/* Hero */}
       <View style={[styles.hero, { backgroundColor: colors.primary }]}>
-        <Ionicons name="briefcase" size={56} color="rgba(255,255,255,.4)" />
+        {service.photoURL
+          ? <Image source={{ uri: service.photoURL }} style={StyleSheet.absoluteFill} resizeMode="cover" />
+          : <Ionicons name="briefcase" size={56} color="rgba(255,255,255,.4)" />
+        }
       </View>
 
       {/* Main info */}
@@ -84,6 +87,11 @@ export default function ServiceDetailScreen({ route, navigation }) {
           <TouchableOpacity style={styles.actionBtn} onPress={() => navigation.navigate('Chat', { receiverId: service.userId })}>
             <Ionicons name="chatbubble-outline" size={22} color={colors.textMuted} />
           </TouchableOpacity>
+          {(isAdmin || service.userId === user?.uid) && (
+            <TouchableOpacity style={[styles.actionBtn, { backgroundColor: `${colors.primary}15` }]} onPress={() => navigation.navigate('ServiceEdit', { id })}>
+              <Ionicons name="pencil" size={20} color={colors.primary} />
+            </TouchableOpacity>
+          )}
         </View>
 
         {service.description && <Text style={styles.description}>{service.description}</Text>}

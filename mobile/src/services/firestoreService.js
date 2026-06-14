@@ -32,18 +32,32 @@ export async function joinCommunity(communityId, userId, password) {
   await updateDoc(doc(db, 'communities', communityId), { memberCount: increment(1) })
 }
 
-export async function getServices({ communityId, category, pageSize = 100, search } = {}) {
-  let constraints = [orderBy('createdAt', 'desc'), limit(pageSize)]
-  if (communityId) constraints = [where('communityId', '==', communityId), ...constraints]
+export async function getServices({ communityId, category, pageSize = 100, search, userId } = {}) {
+  let constraints = [limit(pageSize)]
+  if (communityId) {
+    constraints = [where('communityId', '==', communityId), ...constraints]
+  } else {
+    constraints = [orderBy('createdAt', 'desc'), ...constraints]
+  }
   const q = query(collection(db, 'services'), ...constraints)
   const snap = await getDocs(q)
-  let docs = snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(d => d.status === 'approved')
+  let docs = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+  docs = docs.filter(d => d.status === 'approved' || (userId && d.userId === userId))
+  docs.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0))
   if (search) {
     const s = search.toLowerCase()
     docs = docs.filter(d => d.name?.toLowerCase().includes(s) || d.category?.toLowerCase().includes(s) || d.city?.toLowerCase().includes(s))
   }
   if (category) docs = docs.filter(d => d.category === category)
   return { docs }
+}
+
+export async function updateService(id, data) {
+  await updateDoc(doc(db, 'services', id), { ...data, updatedAt: serverTimestamp() })
+}
+
+export async function deleteService(id) {
+  await deleteDoc(doc(db, 'services', id))
 }
 
 export async function getService(id) {
@@ -64,17 +78,31 @@ export async function createService(data, photoUri, userId) {
   return docRef.id
 }
 
-export async function getCompanies({ communityId, pageSize = 100, search } = {}) {
-  let constraints = [orderBy('createdAt', 'desc'), limit(pageSize)]
-  if (communityId) constraints = [where('communityId', '==', communityId), ...constraints]
+export async function getCompanies({ communityId, pageSize = 100, search, userId } = {}) {
+  let constraints = [limit(pageSize)]
+  if (communityId) {
+    constraints = [where('communityId', '==', communityId), ...constraints]
+  } else {
+    constraints = [orderBy('createdAt', 'desc'), ...constraints]
+  }
   const q = query(collection(db, 'companies'), ...constraints)
   const snap = await getDocs(q)
-  let docs = snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(d => d.status === 'approved')
+  let docs = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+  docs = docs.filter(d => d.status === 'approved' || (userId && d.userId === userId))
+  docs.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0))
   if (search) {
     const s = search.toLowerCase()
     docs = docs.filter(d => d.name?.toLowerCase().includes(s) || d.category?.toLowerCase().includes(s))
   }
   return { docs }
+}
+
+export async function updateCompany(id, data) {
+  await updateDoc(doc(db, 'companies', id), { ...data, updatedAt: serverTimestamp() })
+}
+
+export async function deleteCompany(id) {
+  await deleteDoc(doc(db, 'companies', id))
 }
 
 export async function getCompany(id) {

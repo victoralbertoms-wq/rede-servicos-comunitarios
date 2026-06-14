@@ -19,9 +19,11 @@ import CommunityDetailScreen from '../screens/communities/CommunityDetailScreen'
 import ServicesScreen from '../screens/services/ServicesScreen'
 import ServiceDetailScreen from '../screens/services/ServiceDetailScreen'
 import ServiceCreateScreen from '../screens/services/ServiceCreateScreen'
+import ServiceEditScreen from '../screens/services/ServiceEditScreen'
 import CompaniesScreen from '../screens/companies/CompaniesScreen'
 import CompanyDetailScreen from '../screens/companies/CompanyDetailScreen'
 import CompanyCreateScreen from '../screens/companies/CompanyCreateScreen'
+import CompanyEditScreen from '../screens/companies/CompanyEditScreen'
 import FavoritesScreen from '../screens/favorites/FavoritesScreen'
 import MessagesScreen from '../screens/messages/MessagesScreen'
 import ChatScreen from '../screens/messages/ChatScreen'
@@ -91,8 +93,10 @@ function AppStack() {
       <Stack.Screen name="CommunityDetail" component={CommunityDetailScreen} options={{ title: 'Comunidade' }} />
       <Stack.Screen name="ServiceDetail" component={ServiceDetailScreen} options={{ title: 'Serviço' }} />
       <Stack.Screen name="ServiceCreate" component={ServiceCreateScreen} options={{ title: 'Cadastrar Serviço' }} />
+      <Stack.Screen name="ServiceEdit" component={ServiceEditScreen} options={{ title: 'Editar Serviço' }} />
       <Stack.Screen name="CompanyDetail" component={CompanyDetailScreen} options={{ title: 'Empresa' }} />
       <Stack.Screen name="CompanyCreate" component={CompanyCreateScreen} options={{ title: 'Cadastrar Empresa' }} />
+      <Stack.Screen name="CompanyEdit" component={CompanyEditScreen} options={{ title: 'Editar Empresa' }} />
       <Stack.Screen name="Messages" component={MessagesScreen} options={{ title: 'Mensagens' }} />
       <Stack.Screen name="Chat" component={ChatScreen} options={{ title: 'Chat' }} />
       <Stack.Screen name="AdminDashboard" component={AdminDashboardScreen} options={{ title: 'Painel Admin' }} />

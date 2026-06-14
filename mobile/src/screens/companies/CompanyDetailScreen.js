@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { View, Text, ScrollView, TouchableOpacity, Linking, StyleSheet, Alert } from 'react-native'
+import { View, Text, ScrollView, TouchableOpacity, Linking, Image, TextInput, StyleSheet, Alert } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { getCompany, getReviews, addReview, toggleFavorite } from '../../services/firestoreService'
 import { useAuth } from '../../contexts/AuthContext'
@@ -19,7 +19,7 @@ function Stars({ value, onChange, size = 22 }) {
 
 export default function CompanyDetailScreen({ route, navigation }) {
   const { id } = route.params
-  const { user, userProfile } = useAuth()
+  const { user, userProfile, isAdmin } = useAuth()
   const [company, setCompany] = useState(null)
   const [reviews, setReviews] = useState([])
   const [isFav, setIsFav] = useState(false)
@@ -55,7 +55,14 @@ export default function CompanyDetailScreen({ route, navigation }) {
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={[styles.hero, { backgroundColor: colors.secondary }]}>
-        <View style={styles.heroLogo}><Text style={styles.heroLogoText}>{company.name?.[0]}</Text></View>
+        {company.photoURL
+          ? <Image source={{ uri: company.photoURL }} style={StyleSheet.absoluteFill} resizeMode="cover" />
+          : null
+        }
+        {company.logoURL
+          ? <Image source={{ uri: company.logoURL }} style={styles.heroLogo} resizeMode="contain" />
+          : <View style={styles.heroLogo}><Text style={styles.heroLogoText}>{company.name?.[0]}</Text></View>
+        }
       </View>
 
       <View style={styles.card}>
@@ -79,6 +86,11 @@ export default function CompanyDetailScreen({ route, navigation }) {
           <TouchableOpacity style={styles.actionBtn} onPress={() => navigation.navigate('Chat', { receiverId: company.userId })}>
             <Ionicons name="chatbubble-outline" size={22} color={colors.textMuted} />
           </TouchableOpacity>
+          {(isAdmin || company.userId === user?.uid) && (
+            <TouchableOpacity style={[styles.actionBtn, { backgroundColor: `${colors.secondary}15` }]} onPress={() => navigation.navigate('CompanyEdit', { id })}>
+              <Ionicons name="pencil" size={20} color={colors.secondary} />
+            </TouchableOpacity>
+          )}
         </View>
 
         {company.description && <Text style={styles.description}>{company.description}</Text>}
