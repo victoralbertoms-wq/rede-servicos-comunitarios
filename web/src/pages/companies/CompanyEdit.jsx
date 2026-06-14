@@ -18,6 +18,8 @@ export default function CompanyEdit() {
   const [company, setCompany] = useState(null)
   const [logoFile, setLogoFile] = useState(null)
   const [photoFile, setPhotoFile] = useState(null)
+  const [removeLogo, setRemoveLogo] = useState(false)
+  const [removePhoto, setRemovePhoto] = useState(false)
   const { register, handleSubmit, reset, formState: { errors } } = useForm()
 
   useEffect(() => {
@@ -37,7 +39,9 @@ export default function CompanyEdit() {
     try {
       const updates = { ...data }
       if (logoFile) updates.logoURL = await uploadToCloudinary(logoFile, 'companies')
+      else if (removeLogo) updates.logoURL = ''
       if (photoFile) updates.photoURL = await uploadToCloudinary(photoFile, 'companies')
+      else if (removePhoto) updates.photoURL = ''
       await updateCompany(id, updates)
       toast.success('Empresa atualizada!')
       navigate(`/empresas/${id}`)
@@ -147,18 +151,34 @@ export default function CompanyEdit() {
 
             <div className="grid-2">
               <div className="form-group">
-                <label className="form-label">Nova Logo</label>
-                {company.logoURL && (
-                  <img src={company.logoURL} alt="logo atual" style={{ width: 48, height: 48, borderRadius: 8, objectFit: 'cover', marginBottom: '.5rem', display: 'block' }} />
-                )}
-                <input className="form-input" type="file" accept="image/*" onChange={e => setLogoFile(e.target.files[0])} />
+                <label className="form-label">Logo</label>
+                {company.logoURL && !removeLogo ? (
+                  <div style={{ marginBottom: '.5rem' }}>
+                    <img src={company.logoURL} alt="logo atual" style={{ width: 48, height: 48, borderRadius: 8, objectFit: 'cover', display: 'block', marginBottom: '.4rem' }} />
+                    <button type="button" className="btn btn-sm" style={{ background: 'var(--error)', color: '#fff' }} onClick={() => setRemoveLogo(true)}>Remover</button>
+                  </div>
+                ) : removeLogo ? (
+                  <div style={{ marginBottom: '.5rem', display: 'flex', alignItems: 'center', gap: '.5rem' }}>
+                    <span style={{ fontSize: '.85rem', color: 'var(--text-muted)' }}>Será removida.</span>
+                    <button type="button" className="btn btn-sm btn-secondary" onClick={() => setRemoveLogo(false)}>Desfazer</button>
+                  </div>
+                ) : null}
+                {!removeLogo && <input className="form-input" type="file" accept="image/*" onChange={e => { setLogoFile(e.target.files[0]); setRemoveLogo(false) }} />}
               </div>
               <div className="form-group">
-                <label className="form-label">Nova Foto de Capa</label>
-                {company.photoURL && (
-                  <img src={company.photoURL} alt="foto atual" style={{ width: '100%', height: 60, objectFit: 'cover', borderRadius: 8, marginBottom: '.5rem', display: 'block' }} />
-                )}
-                <input className="form-input" type="file" accept="image/*" onChange={e => setPhotoFile(e.target.files[0])} />
+                <label className="form-label">Foto de Capa</label>
+                {company.photoURL && !removePhoto ? (
+                  <div style={{ marginBottom: '.5rem' }}>
+                    <img src={company.photoURL} alt="foto atual" style={{ width: '100%', height: 60, objectFit: 'cover', borderRadius: 8, display: 'block', marginBottom: '.4rem' }} />
+                    <button type="button" className="btn btn-sm" style={{ background: 'var(--error)', color: '#fff' }} onClick={() => setRemovePhoto(true)}>Remover</button>
+                  </div>
+                ) : removePhoto ? (
+                  <div style={{ marginBottom: '.5rem', display: 'flex', alignItems: 'center', gap: '.5rem' }}>
+                    <span style={{ fontSize: '.85rem', color: 'var(--text-muted)' }}>Será removida.</span>
+                    <button type="button" className="btn btn-sm btn-secondary" onClick={() => setRemovePhoto(false)}>Desfazer</button>
+                  </div>
+                ) : null}
+                {!removePhoto && <input className="form-input" type="file" accept="image/*" onChange={e => { setPhotoFile(e.target.files[0]); setRemovePhoto(false) }} />}
               </div>
             </div>
 

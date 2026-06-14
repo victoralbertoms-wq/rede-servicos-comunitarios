@@ -25,6 +25,7 @@ export default function ServiceEdit() {
   const [fetching, setFetching] = useState(true)
   const [service, setService] = useState(null)
   const [photoFile, setPhotoFile] = useState(null)
+  const [removePhoto, setRemovePhoto] = useState(false)
   const { register, handleSubmit, reset, formState: { errors } } = useForm()
 
   useEffect(() => {
@@ -45,6 +46,7 @@ export default function ServiceEdit() {
     try {
       const updates = { ...data }
       if (photoFile) updates.photoURL = await uploadToCloudinary(photoFile, 'services')
+      else if (removePhoto) updates.photoURL = ''
       await updateService(id, updates)
       toast.success('Serviço atualizado!')
       navigate(`/servicos/${id}`)
@@ -162,11 +164,21 @@ export default function ServiceEdit() {
             </div>
 
             <div className="form-group">
-              <label className="form-label">Nova Foto</label>
-              {service.photoURL && (
-                <img src={service.photoURL} alt="foto atual" style={{ width: '100%', height: 120, objectFit: 'cover', borderRadius: 8, marginBottom: '.5rem', display: 'block' }} />
-              )}
-              <input className="form-input" type="file" accept="image/*" onChange={e => setPhotoFile(e.target.files[0])} />
+              <label className="form-label">Foto</label>
+              {service.photoURL && !removePhoto ? (
+                <div style={{ marginBottom: '.5rem' }}>
+                  <img src={service.photoURL} alt="foto atual" style={{ width: '100%', height: 120, objectFit: 'cover', borderRadius: 8, display: 'block', marginBottom: '.4rem' }} />
+                  <button type="button" className="btn btn-sm" style={{ background: 'var(--error)', color: '#fff' }} onClick={() => setRemovePhoto(true)}>
+                    Remover foto
+                  </button>
+                </div>
+              ) : removePhoto ? (
+                <div style={{ marginBottom: '.5rem', display: 'flex', alignItems: 'center', gap: '.5rem' }}>
+                  <span style={{ fontSize: '.85rem', color: 'var(--text-muted)' }}>Foto será removida ao salvar.</span>
+                  <button type="button" className="btn btn-sm btn-secondary" onClick={() => setRemovePhoto(false)}>Desfazer</button>
+                </div>
+              ) : null}
+              {!removePhoto && <input className="form-input" type="file" accept="image/*" onChange={e => { setPhotoFile(e.target.files[0]); setRemovePhoto(false) }} />}
             </div>
 
             <div style={{ display: 'flex', gap: '.75rem', justifyContent: 'flex-end', marginTop: '.5rem' }}>
