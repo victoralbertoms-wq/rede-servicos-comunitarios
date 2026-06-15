@@ -8,14 +8,31 @@ const APK_URL = 'https://github.com/victoralbertoms-wq/rede-servicos-comunitario
 const EXPO_IOS_URL = 'exp://u.expo.dev/fdef6951-adda-4c6b-abdc-41b60e93d8b9?channel-name=main'
 const APP_STORE = 'https://apps.apple.com/app/expo-go/id982107779'
 
+const ANDROID_STEPS = [
+  'Toque em "Baixar APK" abaixo',
+  'Abra o arquivo baixado na notificação',
+  'Se aparecer aviso de segurança, toque em "Configurações" e ative "Instalar apps desconhecidos"',
+  'Volte e toque em "Instalar"',
+  'Pronto! Abra o app pelo ícone na tela inicial',
+]
+
+const IOS_STEPS = [
+  'Toque em "1. Instalar Expo Go" e baixe o app da App Store',
+  'Após instalar o Expo Go, volte aqui',
+  'Toque em "2. Abrir o App" — o Expo Go abrirá automaticamente com o app',
+]
+
 function AppDownloadBanner() {
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
   const isAndroid = /Android/.test(navigator.userAgent)
+  const [showSteps, setShowSteps] = useState(false)
 
   const openIOS = useCallback(() => {
     window.location.href = EXPO_IOS_URL
     setTimeout(() => { window.location.href = APP_STORE }, 2500)
   }, [])
+
+  const steps = isIOS ? IOS_STEPS : ANDROID_STEPS
 
   return (
     <div style={{
@@ -26,14 +43,8 @@ function AppDownloadBanner() {
         <span style={{ fontSize: '1.2rem' }}>📱</span>
         <h3 style={{ fontWeight: 700, fontSize: '1rem' }}>Baixe o App no Celular</h3>
       </div>
-      <p style={{ fontSize: '.85rem', color: 'var(--text-muted)', marginBottom: '1rem', lineHeight: 1.5 }}>
-        {isAndroid
-          ? 'Toque em "Baixar APK" para instalar o app diretamente no seu Android.'
-          : isIOS
-          ? 'Toque em "Abrir no iPhone" para abrir o app via Expo Go.'
-          : 'Acesse este site pelo celular para baixar o aplicativo.'}
-      </p>
-      <div style={{ display: 'flex', gap: '.75rem', flexWrap: 'wrap' }}>
+
+      <div style={{ display: 'flex', gap: '.75rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
         {(isAndroid || (!isIOS && !isAndroid)) && (
           <a
             href={APK_URL}
@@ -60,7 +71,26 @@ function AppDownloadBanner() {
             </button>
           </>
         )}
+        <button
+          onClick={() => setShowSteps(s => !s)}
+          style={{ display: 'inline-flex', alignItems: 'center', gap: '.4rem', padding: '.65rem 1.2rem', borderRadius: 'var(--radius-full)', background: 'transparent', border: '1.5px solid var(--border)', color: 'var(--text-muted)', fontSize: '.85rem', fontWeight: 600, cursor: 'pointer' }}
+        >
+          {showSteps ? '▲ Fechar' : '❓ Como instalar'}
+        </button>
       </div>
+
+      {showSteps && (
+        <div style={{ background: 'var(--bg)', borderRadius: 'var(--radius-lg)', padding: '1rem 1.25rem' }}>
+          <p style={{ fontSize: '.8rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '.75rem', textTransform: 'uppercase', letterSpacing: '.05em' }}>
+            Passo a passo — {isIOS ? 'iPhone' : 'Android'}
+          </p>
+          <ol style={{ margin: 0, paddingLeft: '1.25rem', display: 'flex', flexDirection: 'column', gap: '.5rem' }}>
+            {steps.map((step, i) => (
+              <li key={i} style={{ fontSize: '.88rem', color: 'var(--text)', lineHeight: 1.5 }}>{step}</li>
+            ))}
+          </ol>
+        </div>
+      )}
     </div>
   )
 }
