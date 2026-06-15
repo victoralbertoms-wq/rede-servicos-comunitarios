@@ -43,7 +43,6 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-notifications",
       [
         "expo-image-picker",
         {
