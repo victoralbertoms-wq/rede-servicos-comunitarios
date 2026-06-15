@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { getCommunities, getServices, getCompanies } from '../services/firestoreService'
 import { useAuth } from '../contexts/AuthContext'
@@ -18,19 +18,15 @@ const ANDROID_STEPS = [
 
 const IOS_STEPS = [
   'Toque em "1. Instalar Expo Go" e baixe o app da App Store',
-  'Após instalar o Expo Go, volte aqui',
-  'Toque em "2. Abrir o App" — o Expo Go abrirá automaticamente com o app',
+  'Abra o Expo Go e toque em "Enter URL manually"',
+  'Digite: u.expo.dev/fdef6951-adda-4c6b-abdc-41b60e93d8b9?channel-name=main',
+  'Ou toque em "2. Abrir o App" nesta página com o Expo Go já instalado',
 ]
 
 function AppDownloadBanner() {
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
   const isAndroid = /Android/.test(navigator.userAgent)
   const [showSteps, setShowSteps] = useState(false)
-
-  const openIOS = useCallback(() => {
-    window.location.href = EXPO_IOS_URL
-    setTimeout(() => { window.location.href = APP_STORE }, 2500)
-  }, [])
 
   const steps = isIOS ? IOS_STEPS : ANDROID_STEPS
 
@@ -63,12 +59,12 @@ function AppDownloadBanner() {
             >
               🍎 1. Instalar Expo Go
             </a>
-            <button
-              onClick={openIOS}
-              style={{ display: 'inline-flex', alignItems: 'center', gap: '.5rem', padding: '.65rem 1.4rem', borderRadius: 'var(--radius-full)', background: 'var(--primary)', color: '#fff', border: 'none', fontSize: '.9rem', fontWeight: 700, cursor: 'pointer' }}
+            <a
+              href={EXPO_IOS_URL}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '.5rem', padding: '.65rem 1.4rem', borderRadius: 'var(--radius-full)', background: 'var(--primary)', color: '#fff', textDecoration: 'none', fontSize: '.9rem', fontWeight: 700 }}
             >
               ▶ 2. Abrir o App
-            </button>
+            </a>
           </>
         )}
         <button
