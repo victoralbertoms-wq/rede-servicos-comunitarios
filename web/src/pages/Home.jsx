@@ -4,20 +4,18 @@ import { getCommunities, getServices, getCompanies } from '../services/firestore
 import { useAuth } from '../contexts/AuthContext'
 import { HiSearch, HiUserGroup, HiBriefcase, HiOfficeBuilding, HiStar, HiArrowRight } from 'react-icons/hi'
 
-const EXPO_URL = 'exp://u.expo.dev/fdef6951-adda-4c6b-abdc-41b60e93d8b9?channel-name=main'
-const PLAY_STORE = 'https://play.google.com/store/apps/details?id=host.exp.exponent'
+const APK_URL = 'https://github.com/victoralbertoms-wq/rede-servicos-comunitarios/releases/download/v1.0.0/Rede.de.Servicos.apk'
+const EXPO_IOS_URL = 'exp://u.expo.dev/fdef6951-adda-4c6b-abdc-41b60e93d8b9?channel-name=main'
 const APP_STORE = 'https://apps.apple.com/app/expo-go/id982107779'
 
 function AppDownloadBanner() {
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
   const isAndroid = /Android/.test(navigator.userAgent)
 
-  const openApp = useCallback(() => {
-    window.location.href = EXPO_URL
-    setTimeout(() => {
-      window.location.href = isIOS ? APP_STORE : PLAY_STORE
-    }, 2500)
-  }, [isIOS])
+  const openIOS = useCallback(() => {
+    window.location.href = EXPO_IOS_URL
+    setTimeout(() => { window.location.href = APP_STORE }, 2500)
+  }, [])
 
   return (
     <div style={{
@@ -29,34 +27,30 @@ function AppDownloadBanner() {
         <h3 style={{ fontWeight: 700, fontSize: '1rem' }}>Baixe o App no Celular</h3>
       </div>
       <p style={{ fontSize: '.85rem', color: 'var(--text-muted)', marginBottom: '1rem', lineHeight: 1.5 }}>
-        {isIOS || isAndroid
-          ? 'Toque no botão abaixo para abrir o app. Instale o Expo Go se ainda não tiver.'
-          : 'Acesse este site pelo celular e toque em "Abrir App" para instalar.'}
+        {isAndroid
+          ? 'Toque em "Baixar APK" para instalar o app diretamente no seu Android.'
+          : isIOS
+          ? 'Toque em "Abrir no iPhone" para abrir o app via Expo Go.'
+          : 'Acesse este site pelo celular para baixar o aplicativo.'}
       </p>
       <div style={{ display: 'flex', gap: '.75rem', flexWrap: 'wrap' }}>
         {(isAndroid || (!isIOS && !isAndroid)) && (
-          <button
-            onClick={openApp}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '.5rem', padding: '.65rem 1.4rem', borderRadius: 'var(--radius-full)', background: '#3ddc84', color: '#000', border: 'none', fontSize: '.9rem', fontWeight: 700, cursor: 'pointer' }}
+          <a
+            href={APK_URL}
+            download
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '.5rem', padding: '.65rem 1.4rem', borderRadius: 'var(--radius-full)', background: '#3ddc84', color: '#000', textDecoration: 'none', fontSize: '.9rem', fontWeight: 700 }}
           >
-            ▶ Abrir App — Android
-          </button>
+            ▶ Baixar APK — Android
+          </a>
         )}
         {(isIOS || (!isIOS && !isAndroid)) && (
           <button
-            onClick={openApp}
+            onClick={openIOS}
             style={{ display: 'inline-flex', alignItems: 'center', gap: '.5rem', padding: '.65rem 1.4rem', borderRadius: 'var(--radius-full)', background: '#1a1a2e', color: '#fff', border: 'none', fontSize: '.9rem', fontWeight: 700, cursor: 'pointer' }}
           >
-            🍎 Abrir App — iPhone
+            🍎 Abrir no iPhone
           </button>
         )}
-        <a
-          href={isIOS ? APP_STORE : PLAY_STORE}
-          target="_blank" rel="noreferrer"
-          style={{ display: 'inline-flex', alignItems: 'center', gap: '.5rem', padding: '.65rem 1.4rem', borderRadius: 'var(--radius-full)', border: '1.5px solid var(--border)', color: 'var(--text-muted)', textDecoration: 'none', fontSize: '.85rem', fontWeight: 600 }}
-        >
-          Instalar Expo Go
-        </a>
       </div>
     </div>
   )
