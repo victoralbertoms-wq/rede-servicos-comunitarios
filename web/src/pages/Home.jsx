@@ -44,12 +44,21 @@ function AppDownloadBanner() {
           </a>
         )}
         {(isIOS || (!isIOS && !isAndroid)) && (
-          <button
-            onClick={openIOS}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '.5rem', padding: '.65rem 1.4rem', borderRadius: 'var(--radius-full)', background: '#1a1a2e', color: '#fff', border: 'none', fontSize: '.9rem', fontWeight: 700, cursor: 'pointer' }}
-          >
-            🍎 Abrir no iPhone
-          </button>
+          <>
+            <a
+              href={APP_STORE}
+              target="_blank" rel="noreferrer"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '.5rem', padding: '.65rem 1.4rem', borderRadius: 'var(--radius-full)', background: '#1a1a2e', color: '#fff', textDecoration: 'none', fontSize: '.9rem', fontWeight: 700 }}
+            >
+              🍎 1. Instalar Expo Go
+            </a>
+            <button
+              onClick={openIOS}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '.5rem', padding: '.65rem 1.4rem', borderRadius: 'var(--radius-full)', background: 'var(--primary)', color: '#fff', border: 'none', fontSize: '.9rem', fontWeight: 700, cursor: 'pointer' }}
+            >
+              ▶ 2. Abrir o App
+            </button>
+          </>
         )}
       </div>
     </div>
