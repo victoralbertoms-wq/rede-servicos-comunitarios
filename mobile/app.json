@@ -51,17 +51,10 @@
         }
       ]
     ],
-    "scheme": "redeservicos",
     "extra": {
       "eas": {
         "projectId": "fdef6951-adda-4c6b-abdc-41b60e93d8b9"
       }
-    },
-    "runtimeVersion": {
-      "policy": "appVersion"
-    },
-    "updates": {
-      "url": "https://u.expo.dev/fdef6951-adda-4c6b-abdc-41b60e93d8b9"
     }
   }
 }
