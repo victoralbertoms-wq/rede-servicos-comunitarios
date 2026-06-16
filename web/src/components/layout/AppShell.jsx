@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Outlet } from 'react-router-dom'
 import Sidebar from './Sidebar'
 import TopHeader from './TopHeader'
+import BottomNav from './BottomNav'
 
 export default function AppShell() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -23,6 +24,7 @@ export default function AppShell() {
           <Outlet />
         </div>
       </div>
+      <BottomNav />
     </div>
   )
 }
