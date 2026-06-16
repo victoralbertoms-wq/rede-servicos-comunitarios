@@ -18,87 +18,66 @@ const ANDROID_STEPS = [
 ]
 
 function AppDownloadBanner() {
-  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
-  const isAndroid = /Android/.test(navigator.userAgent)
-  const isDesktop = !isIOS && !isAndroid
-  const [showSteps, setShowSteps] = useState(false)
+  const [showAndroidSteps, setShowAndroidSteps] = useState(false)
 
   return (
     <div style={{
       background: 'var(--surface)', border: '1.5px solid var(--border)', borderRadius: 'var(--radius-xl)',
       padding: '1.5rem 2rem', marginBottom: '2.5rem',
     }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '.5rem', marginBottom: '.75rem' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '.5rem', marginBottom: '1.25rem' }}>
         <span style={{ fontSize: '1.2rem' }}>📱</span>
         <h3 style={{ fontWeight: 700, fontSize: '1rem' }}>Baixe o App no Celular</h3>
       </div>
 
-      {/* Android */}
-      {(isAndroid || isDesktop) && (
-        <div style={{ marginBottom: '1rem' }}>
-          <p style={{ fontSize: '.8rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '.5rem' }}>ANDROID</p>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.25rem' }}>
+
+        {/* Android */}
+        <div style={{ background: 'var(--bg)', borderRadius: 'var(--radius-lg)', padding: '1rem 1.25rem' }}>
+          <p style={{ fontSize: '.8rem', fontWeight: 700, color: '#3ddc84', marginBottom: '.75rem', letterSpacing: '.05em' }}>🤖 ANDROID</p>
           <a
             href={APK_URL}
             download
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '.5rem', padding: '.65rem 1.4rem', borderRadius: 'var(--radius-full)', background: '#3ddc84', color: '#000', textDecoration: 'none', fontSize: '.9rem', fontWeight: 700 }}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '.5rem', padding: '.6rem 1.3rem', borderRadius: 'var(--radius-full)', background: '#3ddc84', color: '#000', textDecoration: 'none', fontSize: '.9rem', fontWeight: 700, marginBottom: '.75rem' }}
           >
             ▶ Baixar APK
           </a>
-          {isAndroid && (
-            <button
-              onClick={() => setShowSteps(s => !s)}
-              style={{ marginLeft: '.75rem', display: 'inline-flex', alignItems: 'center', gap: '.4rem', padding: '.65rem 1.2rem', borderRadius: 'var(--radius-full)', background: 'transparent', border: '1.5px solid var(--border)', color: 'var(--text-muted)', fontSize: '.85rem', fontWeight: 600, cursor: 'pointer' }}
-            >
-              {showSteps ? '▲ Fechar' : '❓ Como instalar'}
-            </button>
-          )}
-          {isAndroid && showSteps && (
-            <ol style={{ margin: '.75rem 0 0', paddingLeft: '1.25rem', display: 'flex', flexDirection: 'column', gap: '.4rem' }}>
-              {ANDROID_STEPS.map((s, i) => <li key={i} style={{ fontSize: '.88rem', color: 'var(--text)', lineHeight: 1.5 }}>{s}</li>)}
+          <button
+            onClick={() => setShowAndroidSteps(s => !s)}
+            style={{ display: 'block', background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: '.82rem', cursor: 'pointer', padding: 0, textDecoration: 'underline' }}
+          >
+            {showAndroidSteps ? 'Ocultar instruções' : '❓ Como instalar'}
+          </button>
+          {showAndroidSteps && (
+            <ol style={{ margin: '.6rem 0 0', paddingLeft: '1.1rem', display: 'flex', flexDirection: 'column', gap: '.35rem' }}>
+              {ANDROID_STEPS.map((s, i) => <li key={i} style={{ fontSize: '.82rem', color: 'var(--text)', lineHeight: 1.5 }}>{s}</li>)}
             </ol>
           )}
         </div>
-      )}
 
-      {/* iOS */}
-      {(isIOS || isDesktop) && (
-        <div>
-          <p style={{ fontSize: '.8rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '.5rem' }}>IPHONE</p>
-
-          {isIOS ? (
-            /* No iPhone: instrução clara para usar Expo Go manualmente */
-            <div style={{ background: 'var(--bg)', borderRadius: 'var(--radius-lg)', padding: '1rem 1.25rem' }}>
-              <p style={{ fontSize: '.9rem', fontWeight: 700, marginBottom: '.5rem' }}>Como acessar o app no iPhone:</p>
-              <ol style={{ margin: 0, paddingLeft: '1.25rem', display: 'flex', flexDirection: 'column', gap: '.4rem' }}>
-                <li style={{ fontSize: '.88rem', lineHeight: 1.5 }}>
-                  <a href={APP_STORE} target="_blank" rel="noreferrer" style={{ color: 'var(--primary)', fontWeight: 600 }}>Instale o Expo Go</a> pela App Store
-                </li>
-                <li style={{ fontSize: '.88rem', lineHeight: 1.5 }}>Abra o Expo Go e toque em <strong>"Enter URL manually"</strong></li>
-                <li style={{ fontSize: '.88rem', lineHeight: 1.5 }}>
-                  Digite o endereço:
-                  <div style={{ marginTop: '.35rem', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8, padding: '.4rem .75rem', fontFamily: 'monospace', fontSize: '.8rem', wordBreak: 'break-all', userSelect: 'all' }}>
-                    {EXPO_URL_MANUAL}
-                  </div>
-                </li>
-                <li style={{ fontSize: '.88rem', lineHeight: 1.5 }}>Toque em <strong>Go</strong> — o app abrirá!</li>
-              </ol>
-            </div>
-          ) : (
-            /* No desktop: QR code para escanear com o iPhone */
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1.25rem', flexWrap: 'wrap' }}>
-              <img src={QR_IMG} alt="QR Code para abrir no iPhone" style={{ width: 160, height: 160, borderRadius: 8, border: '1px solid var(--border)' }} />
-              <div>
-                <p style={{ fontSize: '.88rem', fontWeight: 600, marginBottom: '.4rem' }}>Escaneie com a câmera do iPhone</p>
-                <ol style={{ margin: 0, paddingLeft: '1.1rem', display: 'flex', flexDirection: 'column', gap: '.35rem' }}>
-                  <li style={{ fontSize: '.85rem', color: 'var(--text)', lineHeight: 1.5 }}>Instale o <a href={APP_STORE} target="_blank" rel="noreferrer" style={{ color: 'var(--primary)' }}>Expo Go</a> na App Store</li>
-                  <li style={{ fontSize: '.85rem', color: 'var(--text)', lineHeight: 1.5 }}>Aponte a câmera do iPhone para o QR code ao lado</li>
-                  <li style={{ fontSize: '.85rem', color: 'var(--text)', lineHeight: 1.5 }}>Toque na notificação que aparecer para abrir no Expo Go</li>
-                </ol>
+        {/* iPhone */}
+        <div style={{ background: 'var(--bg)', borderRadius: 'var(--radius-lg)', padding: '1rem 1.25rem' }}>
+          <p style={{ fontSize: '.8rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '.75rem', letterSpacing: '.05em' }}>🍎 IPHONE</p>
+          <ol style={{ margin: 0, paddingLeft: '1.1rem', display: 'flex', flexDirection: 'column', gap: '.4rem' }}>
+            <li style={{ fontSize: '.85rem', lineHeight: 1.5 }}>
+              <a href={APP_STORE} target="_blank" rel="noreferrer" style={{ color: 'var(--primary)', fontWeight: 600 }}>Instale o Expo Go</a> pela App Store
+            </li>
+            <li style={{ fontSize: '.85rem', lineHeight: 1.5 }}>Abra o Expo Go e toque em <strong>"Enter URL manually"</strong></li>
+            <li style={{ fontSize: '.85rem', lineHeight: 1.5 }}>
+              Digite:
+              <div style={{ marginTop: '.3rem', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 6, padding: '.35rem .65rem', fontFamily: 'monospace', fontSize: '.75rem', wordBreak: 'break-all', userSelect: 'all' }}>
+                {EXPO_URL_MANUAL}
               </div>
-            </div>
-          )}
+            </li>
+            <li style={{ fontSize: '.85rem', lineHeight: 1.5 }}>Toque em <strong>Go</strong> — o app abre!</li>
+          </ol>
+          <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--border)', display: 'flex', gap: '1rem', alignItems: 'center' }}>
+            <img src={QR_IMG} alt="QR Code" style={{ width: 80, height: 80, borderRadius: 6, flexShrink: 0 }} />
+            <p style={{ fontSize: '.78rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>Ou escaneie este QR code com a câmera do iPhone para abrir direto no Expo Go</p>
+          </div>
         </div>
-      )}
+
+      </div>
     </div>
   )
 }
