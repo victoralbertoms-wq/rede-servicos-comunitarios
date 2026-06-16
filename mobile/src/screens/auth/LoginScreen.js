@@ -7,7 +7,7 @@ import { useAuth } from '../../contexts/AuthContext'
 import { colors, spacing, radius } from '../../utils/theme'
 
 export default function LoginScreen({ navigation }) {
-  const { loginWithEmail } = useAuth()
+  const { loginWithEmail, loginWithGoogle } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -80,6 +80,19 @@ export default function LoginScreen({ navigation }) {
           </TouchableOpacity>
         </View>
 
+        {/* Divisor */}
+        <View style={styles.divider}>
+          <View style={styles.dividerLine} />
+          <Text style={styles.dividerText}>ou</Text>
+          <View style={styles.dividerLine} />
+        </View>
+
+        {/* Google */}
+        <TouchableOpacity style={styles.googleBtn} onPress={loginWithGoogle}>
+          <Text style={styles.googleIcon}>G</Text>
+          <Text style={styles.googleText}>Entrar com Google</Text>
+        </TouchableOpacity>
+
         <TouchableOpacity onPress={() => navigation.navigate('Register')}>
           <Text style={styles.registerLink}>
             Não tem conta? <Text style={styles.registerLinkBold}>Cadastre-se grátis</Text>
@@ -109,4 +122,10 @@ const styles = StyleSheet.create({
   btnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
   registerLink: { textAlign: 'center', fontSize: 14, color: 'rgba(255,255,255,.8)' },
   registerLinkBold: { fontWeight: '700', color: '#fff' },
+  divider: { flexDirection: 'row', alignItems: 'center', marginVertical: spacing.md },
+  dividerLine: { flex: 1, height: 1, backgroundColor: 'rgba(255,255,255,.3)' },
+  dividerText: { color: 'rgba(255,255,255,.7)', marginHorizontal: spacing.sm, fontSize: 13 },
+  googleBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#fff', borderRadius: radius.md, padding: 14, marginBottom: spacing.lg, gap: 10 },
+  googleIcon: { fontSize: 18, fontWeight: '800', color: '#4285F4' },
+  googleText: { fontSize: 15, fontWeight: '700', color: '#444' },
 })

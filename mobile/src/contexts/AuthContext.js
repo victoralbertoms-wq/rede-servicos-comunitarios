@@ -6,8 +6,12 @@ import {
   sendPasswordResetEmail,
   updateProfile,
   onAuthStateChanged,
+  GoogleAuthProvider,
+  signInWithCredential,
 } from 'firebase/auth'
 import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore'
+import * as WebBrowser from 'expo-web-browser'
+import * as Google from 'expo-auth-session/providers/google'
 import { auth, db } from '../firebase/config'
 
 const AuthContext = createContext(null)
@@ -16,6 +20,35 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
   const [userProfile, setUserProfile] = useState(null)
   const [loading, setLoading] = useState(true)
+
+  const googleClientId = process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID
+  const [, googleResponse, googlePromptAsync] = Google.useAuthRequest(
+    googleClientId ? { webClientId: googleClientId } : null
+  )
+
+  useEffect(() => {
+    if (googleResponse?.type !== 'success') return
+    const id_token = googleResponse.params?.id_token
+    if (!id_token) return
+    const credential = GoogleAuthProvider.credential(id_token)
+    signInWithCredential(auth, credential).then(async ({ user: firebaseUser }) => {
+      const snap = await getDoc(doc(db, 'users', firebaseUser.uid))
+      if (!snap.exists()) {
+        await setDoc(doc(db, 'users', firebaseUser.uid), {
+          uid: firebaseUser.uid,
+          displayName: firebaseUser.displayName || '',
+          email: firebaseUser.email,
+          photoURL: firebaseUser.photoURL || '',
+          phone: '',
+          role: 'user',
+          communities: [],
+          favorites: { services: [], companies: [] },
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        })
+      }
+    }).catch(() => {})
+  }, [googleResponse])
 
   async function fetchUserProfile(uid) {
     const snap = await getDoc(doc(db, 'users', uid))
@@ -55,6 +88,8 @@ export function AuthProvider({ children }) {
     await sendPasswordResetEmail(auth, email)
   }
 
+  useEffect(() => { WebBrowser.maybeCompleteAuthSession() }, [])
+
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (firebaseUser) => {
       setUser(firebaseUser)
@@ -69,6 +104,7 @@ export function AuthProvider({ children }) {
     <AuthContext.Provider value={{
       user, userProfile, loading,
       registerWithEmail, loginWithEmail, logout, resetPassword, fetchUserProfile,
+      loginWithGoogle: () => googlePromptAsync?.(),
       isAdmin: userProfile?.role === 'admin',
     }}>
       {children}

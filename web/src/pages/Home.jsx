@@ -4,80 +4,43 @@ import { getCommunities, getServices, getCompanies } from '../services/firestore
 import { useAuth } from '../contexts/AuthContext'
 import { HiSearch, HiUserGroup, HiBriefcase, HiOfficeBuilding, HiStar, HiArrowRight } from 'react-icons/hi'
 
-const APK_URL = 'https://github.com/victoralbertoms-wq/rede-servicos-comunitarios/releases/download/v1.0.0/Rede-de-Servicos.apk'
-const APP_STORE = 'https://apps.apple.com/app/expo-go/id982107779'
-const EXPO_URL_MANUAL = 'u.expo.dev/fdef6951-adda-4c6b-abdc-41b60e93d8b9?channel-name=main'
-const QR_IMG = 'https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=exp%3A%2F%2Fu.expo.dev%2Ffdef6951-adda-4c6b-abdc-41b60e93d8b9%3Fchannel-name%3Dmain'
+function InstallPwaBanner() {
+  const [prompt, setPrompt] = useState(null)
+  const [installed, setInstalled] = useState(false)
 
-const ANDROID_STEPS = [
-  'Toque em "Baixar APK" abaixo',
-  'Abra o arquivo baixado na notificação',
-  'Se aparecer aviso, toque em "Configurações" e ative "Instalar apps desconhecidos"',
-  'Volte e toque em "Instalar"',
-  'Pronto! Abra o app pelo ícone na tela inicial',
-]
+  useEffect(() => {
+    const handler = (e) => { e.preventDefault(); setPrompt(e) }
+    window.addEventListener('beforeinstallprompt', handler)
+    window.addEventListener('appinstalled', () => setInstalled(true))
+    return () => window.removeEventListener('beforeinstallprompt', handler)
+  }, [])
 
-function AppDownloadBanner() {
-  const [showAndroidSteps, setShowAndroidSteps] = useState(false)
+  if (installed || !prompt) return null
+
+  async function handleInstall() {
+    prompt.prompt()
+    const { outcome } = await prompt.userChoice
+    if (outcome === 'accepted') setInstalled(true)
+  }
 
   return (
     <div style={{
-      background: 'var(--surface)', border: '1.5px solid var(--border)', borderRadius: 'var(--radius-xl)',
-      padding: '1.5rem 2rem', marginBottom: '2.5rem',
+      background: 'linear-gradient(135deg, #4f46e5 0%, #0ea5e9 100%)',
+      borderRadius: 'var(--radius-xl)', padding: '1.25rem 1.5rem',
+      marginBottom: '2.5rem', display: 'flex', alignItems: 'center',
+      gap: '1rem', flexWrap: 'wrap',
     }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '.5rem', marginBottom: '1.25rem' }}>
-        <span style={{ fontSize: '1.2rem' }}>📱</span>
-        <h3 style={{ fontWeight: 700, fontSize: '1rem' }}>Baixe o App no Celular</h3>
+      <span style={{ fontSize: '1.8rem' }}>📱</span>
+      <div style={{ flex: 1, minWidth: 180 }}>
+        <p style={{ fontWeight: 700, color: '#fff', fontSize: '.95rem', marginBottom: '.15rem' }}>Instale o App no Celular</p>
+        <p style={{ color: 'rgba(255,255,255,.8)', fontSize: '.82rem' }}>Acesse mais rápido direto da tela inicial</p>
       </div>
-
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.25rem' }}>
-
-        {/* Android */}
-        <div style={{ background: 'var(--bg)', borderRadius: 'var(--radius-lg)', padding: '1rem 1.25rem' }}>
-          <p style={{ fontSize: '.8rem', fontWeight: 700, color: '#3ddc84', marginBottom: '.75rem', letterSpacing: '.05em' }}>🤖 ANDROID</p>
-          <a
-            href={APK_URL}
-            download
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '.5rem', padding: '.6rem 1.3rem', borderRadius: 'var(--radius-full)', background: '#3ddc84', color: '#000', textDecoration: 'none', fontSize: '.9rem', fontWeight: 700, marginBottom: '.75rem' }}
-          >
-            ▶ Baixar APK
-          </a>
-          <button
-            onClick={() => setShowAndroidSteps(s => !s)}
-            style={{ display: 'block', background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: '.82rem', cursor: 'pointer', padding: 0, textDecoration: 'underline' }}
-          >
-            {showAndroidSteps ? 'Ocultar instruções' : '❓ Como instalar'}
-          </button>
-          {showAndroidSteps && (
-            <ol style={{ margin: '.6rem 0 0', paddingLeft: '1.1rem', display: 'flex', flexDirection: 'column', gap: '.35rem' }}>
-              {ANDROID_STEPS.map((s, i) => <li key={i} style={{ fontSize: '.82rem', color: 'var(--text)', lineHeight: 1.5 }}>{s}</li>)}
-            </ol>
-          )}
-        </div>
-
-        {/* iPhone */}
-        <div style={{ background: 'var(--bg)', borderRadius: 'var(--radius-lg)', padding: '1rem 1.25rem' }}>
-          <p style={{ fontSize: '.8rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '.75rem', letterSpacing: '.05em' }}>🍎 IPHONE</p>
-          <ol style={{ margin: 0, paddingLeft: '1.1rem', display: 'flex', flexDirection: 'column', gap: '.4rem' }}>
-            <li style={{ fontSize: '.85rem', lineHeight: 1.5 }}>
-              <a href={APP_STORE} target="_blank" rel="noreferrer" style={{ color: 'var(--primary)', fontWeight: 600 }}>Instale o Expo Go</a> pela App Store
-            </li>
-            <li style={{ fontSize: '.85rem', lineHeight: 1.5 }}>Abra o Expo Go e toque em <strong>"Enter URL manually"</strong></li>
-            <li style={{ fontSize: '.85rem', lineHeight: 1.5 }}>
-              Digite:
-              <div style={{ marginTop: '.3rem', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 6, padding: '.35rem .65rem', fontFamily: 'monospace', fontSize: '.75rem', wordBreak: 'break-all', userSelect: 'all' }}>
-                {EXPO_URL_MANUAL}
-              </div>
-            </li>
-            <li style={{ fontSize: '.85rem', lineHeight: 1.5 }}>Toque em <strong>Go</strong> — o app abre!</li>
-          </ol>
-          <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--border)', display: 'flex', gap: '1rem', alignItems: 'center' }}>
-            <img src={QR_IMG} alt="QR Code" style={{ width: 80, height: 80, borderRadius: 6, flexShrink: 0 }} />
-            <p style={{ fontSize: '.78rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>Ou escaneie este QR code com a câmera do iPhone para abrir direto no Expo Go</p>
-          </div>
-        </div>
-
-      </div>
+      <button
+        onClick={handleInstall}
+        style={{ padding: '.6rem 1.4rem', borderRadius: 'var(--radius-full)', background: '#fff', color: '#4f46e5', fontWeight: 700, fontSize: '.9rem', border: 'none', cursor: 'pointer', whiteSpace: 'nowrap' }}
+      >
+        Instalar
+      </button>
     </div>
   )
 }
@@ -208,8 +171,8 @@ export default function Home() {
         </form>
       </div>
 
-      {/* App mobile download */}
-      <AppDownloadBanner />
+      {/* PWA install banner */}
+      <InstallPwaBanner />
 
       {/* Quick links */}
       <div className="grid-3" style={{ marginBottom: '2.5rem' }}>
