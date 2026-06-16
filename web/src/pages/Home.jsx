@@ -4,7 +4,7 @@ import { getCommunities, getServices, getCompanies } from '../services/firestore
 import { useAuth } from '../contexts/AuthContext'
 import { HiSearch, HiUserGroup, HiBriefcase, HiOfficeBuilding, HiStar, HiArrowRight } from 'react-icons/hi'
 
-const APK_URL = 'https://github.com/victoralbertoms-wq/rede-servicos-comunitarios/releases/download/v1.0.0/Rede.de.Servicos.apk'
+const APK_URL = 'https://github.com/victoralbertoms-wq/rede-servicos-comunitarios/releases/download/v1.0.0/Rede-de-Servicos.apk'
 const APP_STORE = 'https://apps.apple.com/app/expo-go/id982107779'
 const EXPO_URL_MANUAL = 'u.expo.dev/fdef6951-adda-4c6b-abdc-41b60e93d8b9?channel-name=main'
 const QR_IMG = 'https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=exp%3A%2F%2Fu.expo.dev%2Ffdef6951-adda-4c6b-abdc-41b60e93d8b9%3Fchannel-name%3Dmain'
