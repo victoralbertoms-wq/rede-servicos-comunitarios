@@ -5,42 +5,64 @@ import { useAuth } from '../contexts/AuthContext'
 import { HiSearch, HiUserGroup, HiBriefcase, HiOfficeBuilding, HiStar, HiArrowRight } from 'react-icons/hi'
 
 function InstallPwaBanner() {
+  const [dismissed, setDismissed] = useState(() => localStorage.getItem('pwa-dismissed') === '1')
   const [prompt, setPrompt] = useState(null)
-  const [installed, setInstalled] = useState(false)
+  const isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent)
+  const isIos = /iPhone|iPad/i.test(navigator.userAgent)
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches
 
   useEffect(() => {
     const handler = (e) => { e.preventDefault(); setPrompt(e) }
     window.addEventListener('beforeinstallprompt', handler)
-    window.addEventListener('appinstalled', () => setInstalled(true))
     return () => window.removeEventListener('beforeinstallprompt', handler)
   }, [])
 
-  if (installed || !prompt) return null
+  if (dismissed || isStandalone || !isMobile) return null
+
+  function dismiss() {
+    localStorage.setItem('pwa-dismissed', '1')
+    setDismissed(true)
+  }
 
   async function handleInstall() {
-    prompt.prompt()
-    const { outcome } = await prompt.userChoice
-    if (outcome === 'accepted') setInstalled(true)
+    if (prompt) {
+      prompt.prompt()
+      const { outcome } = await prompt.userChoice
+      if (outcome === 'accepted') dismiss()
+    }
   }
 
   return (
     <div style={{
       background: 'linear-gradient(135deg, #4f46e5 0%, #0ea5e9 100%)',
-      borderRadius: 'var(--radius-xl)', padding: '1.25rem 1.5rem',
-      marginBottom: '2.5rem', display: 'flex', alignItems: 'center',
-      gap: '1rem', flexWrap: 'wrap',
+      borderRadius: 'var(--radius-xl)', padding: '1rem 1.25rem',
+      marginBottom: '1.5rem',
     }}>
-      <span style={{ fontSize: '1.8rem' }}>📱</span>
-      <div style={{ flex: 1, minWidth: 180 }}>
-        <p style={{ fontWeight: 700, color: '#fff', fontSize: '.95rem', marginBottom: '.15rem' }}>Instale o App no Celular</p>
-        <p style={{ color: 'rgba(255,255,255,.8)', fontSize: '.82rem' }}>Acesse mais rápido direto da tela inicial</p>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '.75rem', marginBottom: isIos ? '.75rem' : 0 }}>
+        <span style={{ fontSize: '1.6rem' }}>📱</span>
+        <div style={{ flex: 1 }}>
+          <p style={{ fontWeight: 700, color: '#fff', fontSize: '.9rem' }}>Instale o App no Celular</p>
+          <p style={{ color: 'rgba(255,255,255,.75)', fontSize: '.78rem', marginTop: '.1rem' }}>Acesse direto da tela inicial, sem abrir o navegador</p>
+        </div>
+        <button onClick={dismiss} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,.6)', fontSize: '1.2rem', cursor: 'pointer', padding: '4px', lineHeight: 1 }}>✕</button>
       </div>
-      <button
-        onClick={handleInstall}
-        style={{ padding: '.6rem 1.4rem', borderRadius: 'var(--radius-full)', background: '#fff', color: '#4f46e5', fontWeight: 700, fontSize: '.9rem', border: 'none', cursor: 'pointer', whiteSpace: 'nowrap' }}
-      >
-        Instalar
-      </button>
+      {isIos ? (
+        <div style={{ background: 'rgba(255,255,255,.15)', borderRadius: 10, padding: '.6rem .875rem', fontSize: '.78rem', color: '#fff', lineHeight: 1.6 }}>
+          Toque em <strong>Compartilhar</strong> (□↑) → <strong>"Adicionar à Tela de Início"</strong>
+        </div>
+      ) : (
+        <div style={{ display: 'flex', gap: '.5rem', marginTop: '.75rem' }}>
+          {prompt ? (
+            <button onClick={handleInstall} style={{ flex: 1, padding: '.55rem', borderRadius: 8, background: '#fff', color: '#4f46e5', fontWeight: 700, fontSize: '.85rem', border: 'none', cursor: 'pointer' }}>
+              Instalar agora
+            </button>
+          ) : (
+            <div style={{ background: 'rgba(255,255,255,.15)', borderRadius: 8, padding: '.55rem .875rem', fontSize: '.78rem', color: '#fff', lineHeight: 1.6 }}>
+              No Chrome: toque nos <strong>⋮ três pontos</strong> → <strong>"Adicionar à tela inicial"</strong>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
 }
