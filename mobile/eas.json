@@ -11,6 +11,15 @@
       "distribution": "internal",
       "android": {
         "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_FIREBASE_API_KEY": "AIzaSyDzHsXE4jc8pvSwaDl171xVXbA_qqXBwf4",
+        "EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN": "rede-servicos.firebaseapp.com",
+        "EXPO_PUBLIC_FIREBASE_PROJECT_ID": "rede-servicos",
+        "EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID": "1008910813540",
+        "EXPO_PUBLIC_FIREBASE_APP_ID": "1:1008910813540:web:5b7ce8485fa4b095c25271",
+        "EXPO_PUBLIC_CLOUDINARY_CLOUD_NAME": "dh3v2u54h",
+        "EXPO_PUBLIC_CLOUDINARY_UPLOAD_PRESET": "rede-servicos"
       }
     },
     "production": {
