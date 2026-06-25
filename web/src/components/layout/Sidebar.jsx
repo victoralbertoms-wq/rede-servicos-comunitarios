@@ -3,7 +3,7 @@ import { useAuth } from '../../contexts/AuthContext'
 import toast from 'react-hot-toast'
 import {
   HiHome, HiUserGroup, HiBriefcase, HiOfficeBuilding,
-  HiHeart, HiChat, HiUser, HiCog, HiShieldCheck, HiLogout
+  HiHeart, HiChat, HiUser, HiShieldCheck, HiLogout, HiBookOpen
 } from 'react-icons/hi'
 
 const navItems = [
@@ -82,6 +82,18 @@ export default function Sidebar({ onClose }) {
             </NavLink>
           </>
         )}
+
+        <p className="nav-section" style={{ marginTop: '1rem' }}>Ajuda</p>
+        <a
+          href="/manual.html"
+          target="_blank"
+          rel="noreferrer"
+          className="nav-item"
+          onClick={onClose}
+        >
+          <HiBookOpen />
+          Manual do Usuário
+        </a>
 
         <div style={{ marginTop: 'auto', padding: '1rem .75rem', borderTop: '1px solid var(--border)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '.75rem', padding: '.5rem .5rem 1rem' }}>
