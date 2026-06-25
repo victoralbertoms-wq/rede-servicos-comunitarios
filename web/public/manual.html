@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manual do Usuário — Rede de Serviços Comunitários</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary: #4f46e5;
+      --secondary: #0ea5e9;
+      --green: #22c55e;
+      --yellow: #f59e0b;
+      --red: #ef4444;
+      --text: #0f172a;
+      --muted: #64748b;
+      --light: #94a3b8;
+      --border: #e2e8f0;
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --radius: 12px;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+    }
+
+    /* ── Header ── */
+    .hero {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      color: #fff;
+      padding: 3rem 1.5rem 4rem;
+      text-align: center;
+    }
+    .hero-logo {
+      width: 72px; height: 72px;
+      background: rgba(255,255,255,.2);
+      border-radius: 20px;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 2.2rem; font-weight: 900;
+      margin-bottom: 1.25rem;
+    }
+    .hero h1 { font-size: clamp(1.5rem, 4vw, 2.4rem); font-weight: 800; margin-bottom: .4rem; }
+    .hero p { font-size: 1rem; opacity: .85; }
+    .hero .version { display: inline-block; margin-top: 1rem; background: rgba(255,255,255,.2); border-radius: 999px; padding: .25rem .9rem; font-size: .78rem; font-weight: 600; }
+
+    /* ── Layout ── */
+    .wrapper { display: flex; max-width: 1100px; margin: -2rem auto 0; gap: 2rem; padding: 0 1.25rem 4rem; align-items: flex-start; }
+
+    /* ── Sidebar TOC ── */
+    .toc {
+      width: 240px; flex-shrink: 0;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      position: sticky; top: 1.5rem;
+    }
+    .toc h2 { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--light); margin-bottom: .875rem; }
+    .toc a { display: flex; align-items: center; gap: .5rem; padding: .35rem .5rem; border-radius: 8px; font-size: .82rem; color: var(--muted); text-decoration: none; transition: all .15s; }
+    .toc a:hover { background: var(--bg); color: var(--text); }
+    .toc a.active { background: rgba(79,70,229,.08); color: var(--primary); font-weight: 600; }
+    .toc .toc-icon { font-size: .9rem; width: 18px; text-align: center; }
+
+    /* ── Content ── */
+    .content { flex: 1; min-width: 0; }
+
+    .section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 1.5rem;
+      overflow: hidden;
+    }
+    .section-header {
+      display: flex; align-items: center; gap: .875rem;
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      user-select: none;
+    }
+    .section-header:hover { background: var(--bg); }
+    .section-icon {
+      width: 40px; height: 40px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; flex-shrink: 0;
+    }
+    .section-title { font-size: 1.05rem; font-weight: 700; flex: 1; }
+    .section-num { font-size: .75rem; font-weight: 700; color: var(--light); background: var(--bg); border-radius: 999px; padding: .15rem .6rem; }
+    .chevron { transition: transform .2s; color: var(--light); font-size: .9rem; }
+    .section.collapsed .chevron { transform: rotate(-90deg); }
+    .section-body { padding: 1.5rem; }
+    .section.collapsed .section-body { display: none; }
+
+    /* ── Typography inside sections ── */
+    .section-body h3 { font-size: .92rem; font-weight: 700; color: var(--primary); margin: 1.25rem 0 .5rem; }
+    .section-body h3:first-child { margin-top: 0; }
+    .section-body p { font-size: .88rem; color: var(--muted); margin-bottom: .75rem; }
+    .section-body p:last-child { margin-bottom: 0; }
+    .section-body ul, .section-body ol { padding-left: 1.4rem; margin-bottom: .75rem; }
+    .section-body li { font-size: .88rem; color: var(--muted); margin-bottom: .3rem; line-height: 1.6; }
+    .section-body strong { color: var(--text); font-weight: 600; }
+
+    /* ── Steps ── */
+    .steps { display: flex; flex-direction: column; gap: .75rem; margin: .75rem 0; }
+    .step { display: flex; gap: .875rem; align-items: flex-start; }
+    .step-num {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--primary); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .75rem; font-weight: 800; flex-shrink: 0; margin-top: .1rem;
+    }
+    .step-content { flex: 1; font-size: .88rem; color: var(--muted); }
+    .step-content strong { color: var(--text); }
+
+    /* ── Alert boxes ── */
+    .alert { border-radius: 10px; padding: .875rem 1rem; margin: .875rem 0; font-size: .84rem; display: flex; gap: .6rem; align-items: flex-start; }
+    .alert-icon { font-size: 1rem; flex-shrink: 0; margin-top: .05rem; }
+    .alert-yellow { background: #fefce8; border: 1px solid #fde047; color: #854d0e; }
+    .alert-blue { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; }
+    .alert-green { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; }
+    .alert-red { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
+
+    /* ── Status badges ── */
+    .status-row { display: flex; flex-direction: column; gap: .625rem; margin: .75rem 0; }
+    .status-item { display: flex; align-items: flex-start; gap: .75rem; }
+    .badge { display: inline-flex; align-items: center; gap: .3rem; padding: .2rem .7rem; border-radius: 999px; font-size: .75rem; font-weight: 700; white-space: nowrap; flex-shrink: 0; margin-top: .1rem; }
+    .badge-yellow { background: #fef9c3; color: #854d0e; }
+    .badge-green { background: #dcfce7; color: #166534; }
+    .badge-red { background: #fee2e2; color: #991b1b; }
+    .status-desc { font-size: .84rem; color: var(--muted); }
+
+    /* ── Feature grid ── */
+    .feature-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: .875rem; margin: .875rem 0; }
+    .feature-card { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: .875rem 1rem; }
+    .feature-card .fi { font-size: 1.4rem; margin-bottom: .4rem; }
+    .feature-card strong { display: block; font-size: .85rem; font-weight: 700; color: var(--text); margin-bottom: .2rem; }
+    .feature-card span { font-size: .78rem; color: var(--muted); }
+
+    /* ── Table ── */
+    table { width: 100%; border-collapse: collapse; font-size: .84rem; margin: .75rem 0; }
+    th { background: var(--bg); padding: .6rem .875rem; text-align: left; font-weight: 700; font-size: .78rem; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; border-bottom: 2px solid var(--border); }
+    td { padding: .6rem .875rem; border-bottom: 1px solid var(--border); color: var(--muted); }
+    tr:last-child td { border-bottom: none; }
+    td:first-child { font-weight: 600; color: var(--text); }
+
+    /* ── Url box ── */
+    .url-box { background: var(--bg); border: 1.5px solid var(--border); border-radius: 8px; padding: .5rem .875rem; font-family: monospace; font-size: .85rem; color: var(--primary); display: inline-block; margin: .4rem 0; word-break: break-all; }
+
+    /* ── Print ── */
+    .print-btn { position: fixed; bottom: 1.5rem; right: 1.5rem; background: var(--primary); color: #fff; border: none; border-radius: 999px; padding: .65rem 1.25rem; font-size: .85rem; font-weight: 700; cursor: pointer; box-shadow: 0 4px 12px rgba(79,70,229,.35); display: flex; align-items: center; gap: .5rem; }
+    .print-btn:hover { background: #3730a3; }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      .toc { display: none; }
+      .wrapper { padding: 0 1rem 3rem; }
+      .section-body { padding: 1.25rem; }
+      .feature-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media print {
+      .toc, .print-btn { display: none; }
+      .wrapper { display: block; padding: 0; }
+      .section { break-inside: avoid; }
+      .section.collapsed .section-body { display: block !important; }
+      .hero { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Hero -->
+<div class="hero">
+  <div class="hero-logo">R</div>
+  <h1>Manual do Usuário</h1>
+  <p>Rede de Serviços Comunitários</p>
+  <span class="version">Versão 1.0 · 2026</span>
+</div>
+
+<div class="wrapper">
+
+  <!-- TOC -->
+  <aside class="toc">
+    <h2>Índice</h2>
+    <a href="#s1" class="toc-link"><span class="toc-icon">🌐</span> O que é o Sistema</a>
+    <a href="#s2" class="toc-link"><span class="toc-icon">🔑</span> Acessar o Sistema</a>
+    <a href="#s3" class="toc-link"><span class="toc-icon">👤</span> Criar Conta</a>
+    <a href="#s4" class="toc-link"><span class="toc-icon">🔧</span> Cadastrar Serviço</a>
+    <a href="#s5" class="toc-link"><span class="toc-icon">🏢</span> Cadastrar Empresa</a>
+    <a href="#s6" class="toc-link"><span class="toc-icon">✏️</span> Editar e Excluir</a>
+    <a href="#s7" class="toc-link"><span class="toc-icon">🏘️</span> Comunidades</a>
+    <a href="#s8" class="toc-link"><span class="toc-icon">🔍</span> Buscar e Filtrar</a>
+    <a href="#s9" class="toc-link"><span class="toc-icon">⭐</span> Avaliações</a>
+    <a href="#s10" class="toc-link"><span class="toc-icon">❤️</span> Favoritos</a>
+    <a href="#s11" class="toc-link"><span class="toc-icon">💬</span> Mensagens</a>
+    <a href="#s12" class="toc-link"><span class="toc-icon">🟡</span> Status dos Cadastros</a>
+    <a href="#s13" class="toc-link"><span class="toc-icon">👤</span> Meu Perfil</a>
+    <a href="#s14" class="toc-link"><span class="toc-icon">💡</span> Dicas Importantes</a>
+  </aside>
+
+  <!-- Content -->
+  <main class="content">
+
+    <!-- 1 -->
+    <div class="section" id="s1">
+      <div class="section-header" onclick="toggle(this)">
+        <div class="section-icon" style="background:#ede9fe">🌐</div>
+        <span class="section-title">O que é o Sistema</span>
+        <span class="section-num">01</span>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="section-body">
+        <p>A <strong>Rede de Serviços Comunitários</strong> é uma plataforma digital que conecta membros de comunidades a profissionais e empresas locais. Funciona como um diretório comunitário inteligente onde qualquer pessoa pode encontrar e oferecer serviços.</p>
+        <div class="feature-grid">
+          <div class="feature-card"><div class="fi">🔧</div><strong>Serviços</strong><span>Cadastre seu serviço profissional</span></div>
+          <div class="feature-card"><div class="fi">🏢</div><strong>Empresas</strong><span>Registre seu comércio ou empresa</span></div>
+          <div class="feature-card"><div class="fi">🏘️</div><strong>Comunidades</strong><span>Participe de grupos locais</span></div>
+          <div class="feature-card"><div class="fi">🔍</div><strong>Busca</strong><span>Encontre o que precisa perto de você</span></div>
+          <div class="feature-card"><div class="fi">⭐</div><strong>Avaliações</strong><span>Veja e dê avaliações</span></div>
+          <div class="feature-card"><div class="fi">💬</div><strong>Mensagens</strong><span>Contato direto com profissionais</span></div>
+        </div>
+        <div class="alert alert-blue">
+          <span class="alert-icon">ℹ️</span>
+          <span>Acesse o sistema em: <span class="url-box">https://rede-servicos.web.app</span></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2 -->
+    <div class="section" id="s2">
+      <div class="section-header" onclick="toggle(this)">
+        <div class="section-icon" style="background:#e0f2fe">🔑</div>
+        <span class="section-title">Acessar o Sistema</span>
+        <span class="section-num">02</span>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="section-body">
+        <h3>Pelo Computador (Navegador)</h3>
+        <p>Abra qualquer navegador (Chrome, Firefox, Edge, Safari) e acesse:</p>
+        <div class="url-box">https://rede-servicos.web.app</div>
+
+        <h3>Pelo Celular (App)</h3>
+        <p>O sistema pode ser instalado como app no celular diretamente pelo navegador:</p>
+        <div class="steps">
+          <div class="step"><div class="step-num">1</div><div class="step-content">Abra o site no <strong>Chrome</strong> (Android) ou <strong>Safari</strong> (iPhone)</div></div>
+          <div class="step"><div class="step-num">2</div><div class="step-content"><strong>Android:</strong> Toque nos ⋮ três pontos → <strong>"Adicionar à tela inicial"</strong></div></div>
+          <div class="step"><div class="step-num">3</div><div class="step-content"><strong>iPhone:</strong> Toque no botão Compartilhar (□↑) → <strong>"Adicionar à Tela de Início"</strong></div></div>
+          <div class="step"><div class="step-num">4</div><div class="step-content">Pronto! O app aparece na tela inicial igual a um app instalado</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3 -->
+    <div class="section" id="s3">
+      <div class="section-header" onclick="toggle(this)">
+        <div class="section-icon" style="background:#dcfce7">👤</div>
+        <span class="section-title">Criar Conta</span>
+        <span class="section-num">03</span>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="section-body">
+        <h3>Cadastro por E-mail</h3>
+        <div class="steps">
+          <div class="step"><div class="step-num">1</div><div class="step-content">Na tela inicial, clique em <strong>"Criar conta"</strong></div></div>
+          <div class="step"><div class="step-num">2</div><div class="step-content">Preencha seu <strong>nome completo</strong>, <strong>e-mail</strong> e <strong>senha</strong> (mínimo 6 caracteres)</div></div>
+          <div class="step"><div class="step-num">3</div><div class="step-content">Clique em <strong>"Cadastrar"</strong></div></div>
+          <div class="step"><div class="step-num">4</div><div class="step-content">Pronto! Você já está logado e pode usar o sistema</div></div>
+        </div>
+
+        <h3>Entrar com Google</h3>
+        <div class="steps">
+          <div class="step"><div class="step-num">1</div><div class="step-content">Na tela de login, toque em <strong>"Entrar com Google"</strong></div></div>
+          <div class="step"><div class="step-num">2</div><div class="step-content">Escolha sua conta Google</div></div>
+          <div class="step"><div class="step-num">3</div><div class="step-content">Pronto! Conta criada automaticamente</div></div>
+        </div>
+
+        <h3>Esqueci a Senha</h3>
+        <p>Na tela de login, clique em <strong>"Esqueci minha senha"</strong>. Informe seu e-mail e você receberá um link para redefinir a senha.</p>
+
+        <div class="alert alert-yellow">
+          <span class="alert-icon">⚠️</span>
+          <span>Use uma senha segura e não a compartilhe com ninguém.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4 -->
+    <div class="section" id="s4">
+      <div class="section-header" onclick="toggle(this)">
+        <div class="section-icon" style="background:#fef3c7">🔧</div>
+        <span class="section-title">Cadastrar Serviço</span>
+        <span class="section-num">04</span>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="section-body">
+        <div class="steps">
+          <div class="step"><div class="step-num">1</div><div class="step-content">No menu, clique em <strong>"Serviços"</strong></div></div>
+          <div class="step"><div class="step-num">2</div><div class="step-content">Clique no botão <strong>"Cadastrar Serviço"</strong></div></div>
+          <div class="step"><div class="step-num">3</div><div class="step-content">Preencha os dados obrigatórios e opcionais</div></div>
+          <div class="step"><div class="step-num">4</div><div class="step-content">Adicione uma foto (opcional, mas recomendado)</div></div>
+          <div class="step"><div class="step-num">5</div><div class="step-content">Clique em <strong>"Cadastrar Serviço"</strong></div></div>
+        </div>
+
+        <h3>Campos do Formulário</h3>
+        <table>
+          <tr><th>Campo</th><th>Obrigatório</th><th>Descrição</th></tr>
+          <tr><td>Nome</td><td>✅ Sim</td><td>Nome do serviço ou profissional</td></tr>
+          <tr><td>Categoria</td><td>✅ Sim</td><td>Tipo de serviço (ex: Elétrica, Saúde)</td></tr>
+          <tr><td>Especialidade</td><td>✅ Sim</td><td>O que você faz especificamente</td></tr>
+          <tr><td>Descrição</td><td>✅ Sim</td><td>Detalhes sobre o serviço</td></tr>
+          <tr><td>Cidade / Estado</td><td>✅ Sim</td><td>Onde atua</td></tr>
+          <tr><td>Telefone</td><td>⬜ Opcional</td><td>Para contato</td></tr>
+          <tr><td>WhatsApp</td><td>⬜ Opcional</td><td>Contato via WhatsApp</td></tr>
+          <tr><td>E-mail</td><td>⬜ Opcional</td><td>E-mail de contato</td></tr>
+          <tr><td>Foto</td><td>⬜ Opcional</td><td>Imagem do serviço ou profissional</td></tr>
+        </table>
+
+        <div class="alert alert-yellow">
+          <span class="alert-icon">⚠️</span>
+          <span>Após cadastrar, o serviço ficará com status <strong>Pendente</strong> até ser aprovado pelo administrador. Somente depois aparecerá na listagem pública.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5 -->
+    <div class="section" id="s5">
+      <div class="section-header" onclick="toggle(this)">
+        <div class="section-icon" style="background:#e0f2fe">🏢</div>
+        <span class="section-title">Cadastrar Empresa</span>
+        <span class="section-num">05</span>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="section-body">
+        <div class="steps">
+          <div class="step"><div class="step-num">1</div><div class="step-content">No menu, clique em <strong>"Empresas"</strong></div></div>
+          <div class="step"><div class="step-num">2</div><div class="step-content">Clique em <strong>"Cadastrar Empresa"</strong></div></div>
+          <div class="step"><div class="step-num">3</div><div class="step-content">Preencha os dados da empresa</div></div>
+          <div class="step"><div class="step-num">4</div><div class="step-content">Adicione logo e foto da fachada (opcional)</div></div>
+          <div class="step"><div class="step-num">5</div><div class="step-content">Clique em <strong>"Cadastrar Empresa"</strong></div></div>
+        </div>
+
+        <h3>Campos do Formulário</h3>
+        <table>
+          <tr><th>Campo</th><th>Obrigatório</th><th>Descrição</th></tr>
+          <tr><td>Nome da Empresa</td><td>✅ Sim</td><td>Nome fantasia ou razão social</td></tr>
+          <tr><td>Categoria</td><td>✅ Sim</td><td>Tipo de negócio</td></tr>
+          <tr><td>Descrição</td><td>✅ Sim</td><td>O que a empresa faz</td></tr>
+          <tr><td>Cidade / Estado</td><td>✅ Sim</td><td>Localização</td></tr>
+          <tr><td>CNPJ</td><td>⬜ Opcional</td><td>Número do CNPJ</td></tr>
+          <tr><td>Endereço</td><td>⬜ Opcional</td><td>Endereço completo</td></tr>
+          <tr><td>Contatos</td><td>⬜ Opcional</td><td>Telefone, WhatsApp, E-mail, Site</td></tr>
+          <tr><td>Logo</td><td>⬜ Opcional</td><td>Logotipo da empresa</td></tr>
+          <tr><td>Foto</td><td>⬜ Opcional</td><td>Foto da fachada ou estabelecimento</td></tr>
+        </table>
+
+        <div class="alert alert-yellow">
+          <span class="alert-icon">⚠️</span>
+          <span>Assim como os serviços, a empresa ficará <strong>pendente</strong> até ser aprovada pelo administrador.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6 -->
+    <div class="section" id="s6">
+      <div class="section-header" onclick="toggle(this)">
+        <div class="section-icon" style="background:#fce7f3">✏️</div>
+        <span class="section-title">Editar e Excluir Cadastros</span>
+        <span class="section-num">06</span>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="section-body">
+        <h3>Como Editar</h3>
+        <div class="steps">
+          <div class="step"><div class="step-num">1</div><div class="step-content">Acesse a página de detalhe do serviço ou empresa</div></div>
+          <div class="step"><div class="step-num">2</div><div class="step-content">Clique no botão <strong>✏️ Editar</strong> (aparece apenas para o dono ou admin)</div></div>
+          <div class="step"><div class="step-num">3</div><div class="step-content">Altere os campos desejados</div></div>
+          <div class="step"><div class="step-num">4</div><div class="step-content">Para trocar a foto: clique em <strong>"Escolher foto"</strong> e selecione uma nova</div></div>
+          <div class="step"><div class="step-num">5</div><div class="step-content">Para remover a foto: clique no botão vermelho <strong>"Remover foto"</strong></div></div>
+          <div class="step"><div class="step-num">6</div><div class="step-content">Clique em <strong>"Salvar Alterações"</strong></div></div>
+        </div>
+
+        <h3>Como Excluir</h3>
+        <p>Na página de detalhe, clique em <strong>🗑️ Excluir</strong> e confirme a ação. A exclusão é <strong>permanente</strong> e não pode ser desfeita.</p>
+
+        <div class="alert alert-red">
+          <span class="alert-icon">🚫</span>
+          <span>Somente o <strong>dono do cadastro</strong> ou um <strong>administrador</strong> pode editar ou excluir.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7 -->
+    <div class="section" id="s7">
+      <div class="section-header" onclick="toggle(this)">
+        <div class="section-icon" style="background:#ede9fe">🏘️</div>
+        <span class="section-title">Comunidades</span>
+        <span class="section-num">07</span>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="section-body">
+        <p>Comunidades são grupos onde membros compartilham serviços e empresas entre si — como uma rede interna de uma congregação, associação de bairro ou grupo.</p>
+
+        <h3>Como Entrar em uma Comunidade</h3>
+        <div class="steps">
+          <div class="step"><div class="step-num">1</div><div class="step-content">No menu, clique em <strong>"Comunidades"</strong></div></div>
+          <div class="step"><div class="step-num">2</div><div class="step-content">Clique na comunidade que deseja entrar</div></div>
+          <div class="step"><div class="step-num">3</div><div class="step-content">Se a comunidade tiver senha, informe a <strong>senha de acesso</strong></div></div>
+          <div class="step"><div class="step-num">4</div><div class="step-content">Clique em <strong>"Entrar"</strong></div></div>
+        </div>
+
+        <div class="alert alert-blue">
+          <span class="alert-icon">ℹ️</span>
+          <span>Dentro da comunidade você verá os serviços e empresas vinculados a ela, além dos membros.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 8 -->
+    <div class="section" id="s8">
+      <div class="section-header" onclick="toggle(this)">
+        <div class="section-icon" style="background:#e0f2fe">🔍</div>
+        <span class="section-title">Buscar e Filtrar</span>
+        <span class="section-num">08</span>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="section-body">
+        <div class="feature-grid">
+          <div class="feature-card"><div class="fi">🔍</div><strong>Busca por texto</strong><span>Digite nome, categoria ou cidade — resultado em tempo real</span></div>
+          <div class="feature-card"><div class="fi">📂</div><strong>Filtro por categoria</strong><span>Use o menu suspenso para filtrar por tipo de serviço</span></div>
+          <div class="feature-card"><div class="fi">📍</div><strong>Filtro por cidade</strong><span>Filtre serviços e empresas da sua cidade</span></div>
+          <div class="feature-card"><div class="fi">⭐</div><strong>Ver detalhes</strong><span>Clique em qualquer card para abrir a página completa</span></div>
+        </div>
+
+        <h3>Contato Direto</h3>
+        <p>Na página de detalhe de um serviço ou empresa, use os botões de contato:</p>
+        <ul>
+          <li><strong>📞 Telefone</strong> — Liga diretamente</li>
+          <li><strong>💬 WhatsApp</strong> — Abre conversa no WhatsApp</li>
+          <li><strong>📧 E-mail</strong> — Abre seu app de e-mail</li>
+          <li><strong>🌐 Site</strong> — Abre o site da empresa</li>
+          <li><strong>💬 Mensagem</strong> — Envia mensagem dentro do sistema</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 9 -->
+    <div class="section" id="s9">
+      <div class="section-header" onclick="toggle(this)">
+        <div class="section-icon" style="background:#fef9c3">⭐</div>
+        <span class="section-title">Avaliações</span>
+        <span class="section-num">09</span>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="section-body">
+        <div class="steps">
+          <div class="step"><div class="step-num">1</div><div class="step-content">Abra a página de um serviço ou empresa</div></div>
+          <div class="step"><div class="step-num">2</div><div class="step-content">Role até a seção <strong>"Avaliações"</strong></div></div>
+          <div class="step"><div class="step-num">3</div><div class="step-content">Clique nas ⭐ estrelas para dar uma nota de 1 a 5</div></div>
+          <div class="step"><div class="step-num">4</div><div class="step-content">Escreva um comentário (opcional)</div></div>
+          <div class="step"><div class="step-num">5</div><div class="step-content">Clique em <strong>"Enviar avaliação"</strong></div></div>
+        </div>
+        <div class="alert alert-green">
+          <span class="alert-icon">💡</span>
+          <span>Peça para clientes satisfeitos avaliarem seu serviço — avaliações positivas aumentam a visibilidade!</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 10 -->
+    <div class="section" id="s10">
+      <div class="section-header" onclick="toggle(this)">
+        <div class="section-icon" style="background:#fee2e2">❤️</div>
+        <span class="section-title">Favoritos</span>
+        <span class="section-num">10</span>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="section-body">
+        <p>Salve serviços e empresas para acessar rapidamente depois.</p>
+        <div class="steps">
+          <div class="step"><div class="step-num">1</div><div class="step-content">Na página de detalhe de um serviço ou empresa, clique no ícone <strong>❤️</strong></div></div>
+          <div class="step"><div class="step-num">2</div><div class="step-content">O item é salvo nos seus favoritos</div></div>
+          <div class="step"><div class="step-num">3</div><div class="step-content">Acesse todos os favoritos pelo menu <strong>"Favoritos"</strong></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 11 -->
+    <div class="section" id="s11">
+      <div class="section-header" onclick="toggle(this)">
+        <div class="section-icon" style="background:#dcfce7">💬</div>
+        <span class="section-title">Mensagens</span>
+        <span class="section-num">11</span>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="section-body">
+        <div class="steps">
+          <div class="step"><div class="step-num">1</div><div class="step-content">Abra a página de um serviço ou empresa</div></div>
+          <div class="step"><div class="step-num">2</div><div class="step-content">Clique no botão <strong>"💬 Mensagem"</strong></div></div>
+          <div class="step"><div class="step-num">3</div><div class="step-content">Uma conversa privada será aberta com o dono do cadastro</div></div>
+          <div class="step"><div class="step-num">4</div><div class="step-content">Acesse todas as conversas pelo menu <strong>"Mensagens"</strong></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 12 -->
+    <div class="section" id="s12">
+      <div class="section-header" onclick="toggle(this)">
+        <div class="section-icon" style="background:#fef3c7">🟡</div>
+        <span class="section-title">Status dos Cadastros</span>
+        <span class="section-num">12</span>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="section-body">
+        <p>Todo serviço ou empresa cadastrado passa por um processo de aprovação:</p>
+        <div class="status-row">
+          <div class="status-item">
+            <span class="badge badge-yellow">🟡 PENDENTE</span>
+            <span class="status-desc">Cadastro enviado, aguardando revisão do administrador. Apenas você consegue ver.</span>
+          </div>
+          <div class="status-item">
+            <span class="badge badge-green">🟢 APROVADO</span>
+            <span class="status-desc">Cadastro aprovado. Aparece na listagem pública para todos os usuários.</span>
+          </div>
+          <div class="status-item">
+            <span class="badge badge-red">🔴 REJEITADO</span>
+            <span class="status-desc">Cadastro não aprovado. Entre em contato com o administrador para mais informações.</span>
+          </div>
+        </div>
+        <div class="alert alert-blue">
+          <span class="alert-icon">ℹ️</span>
+          <span>O tempo de aprovação depende do administrador da sua comunidade. Aguarde o contato após o envio.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 13 -->
+    <div class="section" id="s13">
+      <div class="section-header" onclick="toggle(this)">
+        <div class="section-icon" style="background:#ede9fe">👤</div>
+        <span class="section-title">Meu Perfil</span>
+        <span class="section-num">13</span>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="section-body">
+        <p>Acesse <strong>"Meu Perfil"</strong> no menu lateral para gerenciar sua conta:</p>
+        <ul>
+          <li>Atualizar <strong>nome</strong> e <strong>foto de perfil</strong></li>
+          <li>Editar informações de <strong>contato</strong></li>
+          <li>Ver todos os seus <strong>serviços e empresas</strong> cadastrados</li>
+          <li>Acompanhar o <strong>status</strong> de cada cadastro</li>
+        </ul>
+        <div class="alert alert-yellow">
+          <span class="alert-icon">⚠️</span>
+          <span>Para alterar sua senha, acesse o perfil e clique em <strong>"Alterar senha"</strong>. Você receberá um e-mail com o link de redefinição.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 14 -->
+    <div class="section" id="s14">
+      <div class="section-header" onclick="toggle(this)">
+        <div class="section-icon" style="background:#dcfce7">💡</div>
+        <span class="section-title">Dicas Importantes</span>
+        <span class="section-num">14</span>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="section-body">
+        <div class="feature-grid">
+          <div class="feature-card"><div class="fi">✅</div><strong>Dados atualizados</strong><span>Telefone e WhatsApp corretos aumentam as chances de contato</span></div>
+          <div class="feature-card"><div class="fi">📸</div><strong>Adicione fotos</strong><span>Cadastros com foto recebem muito mais atenção</span></div>
+          <div class="feature-card"><div class="fi">⭐</div><strong>Peça avaliações</strong><span>Clientes satisfeitos podem avaliar seu serviço</span></div>
+          <div class="feature-card"><div class="fi">🔔</div><strong>Aguarde aprovação</strong><span>O admin precisa aprovar antes de aparecer publicamente</span></div>
+          <div class="feature-card"><div class="fi">🔒</div><strong>Proteja sua senha</strong><span>Não compartilhe sua senha com ninguém</span></div>
+          <div class="feature-card"><div class="fi">📱</div><strong>Use no celular</strong><span>Instale como app para acesso mais rápido</span></div>
+        </div>
+
+        <h3>Suporte</h3>
+        <p>Em caso de dúvidas ou problemas:</p>
+        <ul>
+          <li>Fale com o <strong>administrador</strong> da sua comunidade</li>
+          <li>Acesse o sistema em: <span class="url-box">https://rede-servicos.web.app</span></li>
+        </ul>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<button class="print-btn" onclick="window.print()">🖨️ Imprimir Manual</button>
+
+<script>
+  function toggle(header) {
+    header.parentElement.classList.toggle('collapsed')
+  }
+
+  // Highlight active TOC item on scroll
+  const sections = document.querySelectorAll('.section')
+  const links = document.querySelectorAll('.toc-link')
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'))
+        const link = document.querySelector(`.toc-link[href="#${e.target.id}"]`)
+        if (link) link.classList.add('active')
+      }
+    })
+  }, { threshold: 0.3 })
+
+  sections.forEach(s => observer.observe(s))
+
+  // Smooth scroll
+  links.forEach(l => {
+    l.addEventListener('click', e => {
+      e.preventDefault()
+      document.querySelector(l.getAttribute('href')).scrollIntoView({ behavior: 'smooth', block: 'start' })
+    })
+  })
+</script>
+</body>
+</html>
