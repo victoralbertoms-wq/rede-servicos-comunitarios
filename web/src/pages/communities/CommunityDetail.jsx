@@ -1,11 +1,178 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
+import { collection, query, where, getDocs } from 'firebase/firestore'
+import { db } from '../../firebase/config'
 import { getCommunity, getServices, getCompanies, deleteCommunity, getCommunityMembers } from '../../services/firestoreService'
 import { useAuth } from '../../contexts/AuthContext'
 import toast from 'react-hot-toast'
-import { HiUserGroup, HiBriefcase, HiOfficeBuilding, HiPencil, HiTrash, HiUser } from 'react-icons/hi'
+import {
+  HiUserGroup, HiBriefcase, HiOfficeBuilding, HiPencil, HiTrash,
+  HiUser, HiChat, HiX, HiStar,
+} from 'react-icons/hi'
 
-function MemberCard({ member }) {
+function MemberProfileModal({ member, onClose }) {
+  const navigate = useNavigate()
+  const user = member.user
+  const name = user?.displayName || 'Usuário'
+  const [services, setServices] = useState([])
+  const [companies, setCompanies] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    async function load() {
+      const [sSnap, cSnap] = await Promise.all([
+        getDocs(query(collection(db, 'services'), where('userId', '==', member.userId))),
+        getDocs(query(collection(db, 'companies'), where('userId', '==', member.userId))),
+      ])
+      setServices(sSnap.docs.map(d => ({ id: d.id, ...d.data() })).filter(d => d.status === 'approved'))
+      setCompanies(cSnap.docs.map(d => ({ id: d.id, ...d.data() })).filter(d => d.status === 'approved'))
+      setLoading(false)
+    }
+    load()
+  }, [member.userId])
+
+  function handleMessage() {
+    onClose()
+    navigate(`/mensagens?to=${member.userId}`)
+  }
+
+  const joinedDate = member.joinedAt?.toDate
+    ? member.joinedAt.toDate().toLocaleDateString('pt-BR')
+    : ''
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal" onClick={e => e.stopPropagation()} style={{ maxWidth: 480 }}>
+        {/* Header */}
+        <div className="modal-header">
+          <h2 className="modal-title">Perfil do Membro</h2>
+          <button className="btn-icon btn-sm" onClick={onClose}><HiX /></button>
+        </div>
+
+        {/* Avatar + info */}
+        <div style={{ padding: '1.25rem 1.5rem', display: 'flex', gap: '1rem', alignItems: 'center', borderBottom: '1px solid var(--border)' }}>
+          <div style={{
+            width: 64, height: 64, borderRadius: '50%', flexShrink: 0,
+            background: user?.photoURL ? `url(${user.photoURL}) center/cover` : 'linear-gradient(135deg,var(--primary),var(--secondary))',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            color: '#fff', fontWeight: 700, fontSize: 26,
+          }}>
+            {!user?.photoURL && name[0]?.toUpperCase()}
+          </div>
+          <div style={{ flex: 1 }}>
+            <p style={{ fontWeight: 700, fontSize: '1.05rem' }}>{name}</p>
+            {user?.email && <p style={{ fontSize: '.82rem', color: 'var(--text-muted)', marginTop: '.15rem' }}>{user.email}</p>}
+            {joinedDate && <p style={{ fontSize: '.78rem', color: 'var(--text-light)', marginTop: '.15rem' }}>Membro desde {joinedDate}</p>}
+          </div>
+          <button className="btn btn-primary btn-sm" onClick={handleMessage} style={{ flexShrink: 0 }}>
+            <HiChat /> Mensagem
+          </button>
+        </div>
+
+        {/* Services & Companies */}
+        <div style={{ padding: '1rem 1.5rem 1.5rem', maxHeight: 360, overflowY: 'auto' }}>
+          {loading ? (
+            <div style={{ display: 'flex', justifyContent: 'center', padding: '2rem' }}><div className="spinner" /></div>
+          ) : (
+            <>
+              {/* Services */}
+              {services.length > 0 && (
+                <div style={{ marginBottom: '1.25rem' }}>
+                  <p style={{ fontWeight: 700, fontSize: '.8rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: '.6rem' }}>
+                    <HiBriefcase style={{ display: 'inline', marginRight: 4 }} />Serviços ({services.length})
+                  </p>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '.5rem' }}>
+                    {services.map(s => (
+                      <Link
+                        key={s.id}
+                        to={`/servicos/${s.id}`}
+                        onClick={onClose}
+                        style={{ textDecoration: 'none' }}
+                      >
+                        <div style={{
+                          padding: '.65rem .875rem', borderRadius: 'var(--radius)',
+                          border: '1px solid var(--border)', background: 'var(--surface)',
+                          display: 'flex', alignItems: 'center', gap: '.75rem',
+                        }}
+                          onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--primary)'}
+                          onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border)'}
+                        >
+                          <div style={{
+                            width: 36, height: 36, borderRadius: 8, flexShrink: 0,
+                            background: s.photoURL ? `url(${s.photoURL}) center/cover` : 'linear-gradient(135deg,var(--primary),var(--secondary))',
+                          }} />
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <p style={{ fontWeight: 600, fontSize: '.88rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.name}</p>
+                            <p style={{ fontSize: '.75rem', color: 'var(--text-muted)' }}>{s.category} · {s.city}</p>
+                          </div>
+                          {s.rating > 0 && (
+                            <span style={{ display: 'flex', alignItems: 'center', gap: '.2rem', fontSize: '.75rem', color: 'var(--accent)', flexShrink: 0 }}>
+                              <HiStar /> {s.rating.toFixed(1)}
+                            </span>
+                          )}
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Companies */}
+              {companies.length > 0 && (
+                <div>
+                  <p style={{ fontWeight: 700, fontSize: '.8rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: '.6rem' }}>
+                    <HiOfficeBuilding style={{ display: 'inline', marginRight: 4 }} />Empresas ({companies.length})
+                  </p>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '.5rem' }}>
+                    {companies.map(c => (
+                      <Link
+                        key={c.id}
+                        to={`/empresas/${c.id}`}
+                        onClick={onClose}
+                        style={{ textDecoration: 'none' }}
+                      >
+                        <div style={{
+                          padding: '.65rem .875rem', borderRadius: 'var(--radius)',
+                          border: '1px solid var(--border)', background: 'var(--surface)',
+                          display: 'flex', alignItems: 'center', gap: '.75rem',
+                        }}
+                          onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--secondary)'}
+                          onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border)'}
+                        >
+                          <div style={{
+                            width: 36, height: 36, borderRadius: 8, flexShrink: 0,
+                            background: c.logoURL ? `url(${c.logoURL}) center/cover` : 'linear-gradient(135deg,var(--secondary),var(--success))',
+                          }} />
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <p style={{ fontWeight: 600, fontSize: '.88rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.name}</p>
+                            <p style={{ fontSize: '.75rem', color: 'var(--text-muted)' }}>{c.category}</p>
+                          </div>
+                          {c.rating > 0 && (
+                            <span style={{ display: 'flex', alignItems: 'center', gap: '.2rem', fontSize: '.75rem', color: 'var(--accent)', flexShrink: 0 }}>
+                              <HiStar /> {c.rating.toFixed(1)}
+                            </span>
+                          )}
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {services.length === 0 && companies.length === 0 && (
+                <p style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: '.88rem', padding: '1rem 0' }}>
+                  Este membro ainda não tem serviços ou empresas cadastrados.
+                </p>
+              )}
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function MemberCard({ member, onClick }) {
   const user = member.user
   const name = user?.displayName || 'Usuário'
   const initial = name[0]?.toUpperCase() || 'U'
@@ -14,7 +181,17 @@ function MemberCard({ member }) {
     : ''
 
   return (
-    <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '.75rem', padding: '.875rem 1rem' }}>
+    <button
+      onClick={onClick}
+      style={{
+        width: '100%', border: '1px solid var(--border)', borderRadius: 'var(--radius)',
+        background: 'var(--surface)', cursor: 'pointer', textAlign: 'left',
+        display: 'flex', alignItems: 'center', gap: '.75rem', padding: '.875rem 1rem',
+        transition: 'border-color .15s, box-shadow .15s',
+      }}
+      onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--primary)'; e.currentTarget.style.boxShadow = '0 0 0 3px var(--primary-alpha)' }}
+      onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.boxShadow = 'none' }}
+    >
       <div style={{
         width: 40, height: 40, borderRadius: '50%', flexShrink: 0,
         background: user?.photoURL ? `url(${user.photoURL}) center/cover` : 'linear-gradient(135deg,var(--primary),var(--secondary))',
@@ -25,12 +202,12 @@ function MemberCard({ member }) {
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
         <p style={{ fontWeight: 600, fontSize: '.88rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</p>
-        {joinedDate && <p style={{ fontSize: '.75rem', color: 'var(--text-muted)' }}>Entrou em {joinedDate}</p>}
+        {joinedDate && <p style={{ fontSize: '.75rem', color: 'var(--text-muted)' }}>Desde {joinedDate}</p>}
       </div>
-      {member.role === 'admin' && (
-        <span className="badge badge-warning" style={{ fontSize: '.65rem' }}>Admin</span>
-      )}
-    </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '.35rem', fontSize: '.72rem', color: 'var(--primary)', flexShrink: 0 }}>
+        <HiChat /> Ver perfil
+      </div>
+    </button>
   )
 }
 
@@ -45,6 +222,7 @@ export default function CommunityDetail() {
   const [tab, setTab] = useState('services')
   const [loading, setLoading] = useState(true)
   const [loadingMembers, setLoadingMembers] = useState(false)
+  const [selectedMember, setSelectedMember] = useState(null)
 
   useEffect(() => {
     Promise.all([
@@ -190,9 +368,18 @@ export default function CommunityDetail() {
           <div className="empty-state"><HiUser /><h3>Nenhum membro ainda</h3></div>
         ) : (
           <div className="grid-2">
-            {members.map(m => <MemberCard key={m.id} member={m} />)}
+            {members.map(m => (
+              <MemberCard key={m.id} member={m} onClick={() => setSelectedMember(m)} />
+            ))}
           </div>
         )
+      )}
+
+      {selectedMember && (
+        <MemberProfileModal
+          member={selectedMember}
+          onClose={() => setSelectedMember(null)}
+        />
       )}
     </div>
   )
