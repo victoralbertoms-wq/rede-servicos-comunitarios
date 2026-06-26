@@ -78,10 +78,11 @@ export async function getCommunityMembers(communityId) {
   const q = query(
     collection(db, 'community_members'),
     where('communityId', '==', communityId),
-    orderBy('joinedAt', 'desc'),
   )
   const snap = await getDocs(q)
-  const members = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+  const members = snap.docs
+    .map(d => ({ id: d.id, ...d.data() }))
+    .sort((a, b) => (b.joinedAt?.seconds || 0) - (a.joinedAt?.seconds || 0))
   const userSnaps = await Promise.all(members.map(m => getDoc(doc(db, 'users', m.userId))))
   return members.map((m, i) => ({ ...m, user: userSnaps[i].data() || null }))
 }
