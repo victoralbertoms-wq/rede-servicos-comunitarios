@@ -76,7 +76,14 @@ export async function getCommunityMembers(communityId) {
     orderBy('joinedAt', 'desc'),
   )
   const snap = await getDocs(q)
-  return snap.docs.map(d => ({ id: d.id, ...d.data() }))
+  const members = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+  const userSnaps = await Promise.all(members.map(m => getDoc(doc(db, 'users', m.userId))))
+  return members.map((m, i) => ({ ...m, user: userSnaps[i].data() || null }))
+}
+
+export async function getUser(uid) {
+  const snap = await getDoc(doc(db, 'users', uid))
+  return snap.exists() ? { id: snap.id, ...snap.data() } : null
 }
 
 // ── Services ───────────────────────────────────────────────────────────────────

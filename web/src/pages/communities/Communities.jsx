@@ -7,6 +7,7 @@ import { HiUserGroup, HiLockClosed, HiSearch, HiPlus } from 'react-icons/hi'
 
 function JoinModal({ community, onClose, onJoined }) {
   const { user } = useAuth()
+  const navigate = useNavigate()
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -16,6 +17,7 @@ function JoinModal({ community, onClose, onJoined }) {
       await joinCommunity(community.id, user.uid, password)
       toast.success(`Você entrou em ${community.name}!`)
       onJoined()
+      navigate(`/comunidades/${community.id}`)
     } catch (err) {
       toast.error(err.message || 'Erro ao entrar na comunidade.')
     } finally {

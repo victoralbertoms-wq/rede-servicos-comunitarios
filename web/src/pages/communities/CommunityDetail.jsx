@@ -1,9 +1,38 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
-import { getCommunity, getServices, getCompanies, deleteCommunity } from '../../services/firestoreService'
+import { getCommunity, getServices, getCompanies, deleteCommunity, getCommunityMembers } from '../../services/firestoreService'
 import { useAuth } from '../../contexts/AuthContext'
 import toast from 'react-hot-toast'
-import { HiUserGroup, HiBriefcase, HiOfficeBuilding, HiPencil, HiTrash } from 'react-icons/hi'
+import { HiUserGroup, HiBriefcase, HiOfficeBuilding, HiPencil, HiTrash, HiUser } from 'react-icons/hi'
+
+function MemberCard({ member }) {
+  const user = member.user
+  const name = user?.displayName || 'Usuário'
+  const initial = name[0]?.toUpperCase() || 'U'
+  const joinedDate = member.joinedAt?.toDate
+    ? member.joinedAt.toDate().toLocaleDateString('pt-BR')
+    : ''
+
+  return (
+    <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '.75rem', padding: '.875rem 1rem' }}>
+      <div style={{
+        width: 40, height: 40, borderRadius: '50%', flexShrink: 0,
+        background: user?.photoURL ? `url(${user.photoURL}) center/cover` : 'linear-gradient(135deg,var(--primary),var(--secondary))',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        color: '#fff', fontWeight: 700, fontSize: '.9rem',
+      }}>
+        {!user?.photoURL && initial}
+      </div>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <p style={{ fontWeight: 600, fontSize: '.88rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</p>
+        {joinedDate && <p style={{ fontSize: '.75rem', color: 'var(--text-muted)' }}>Entrou em {joinedDate}</p>}
+      </div>
+      {member.role === 'admin' && (
+        <span className="badge badge-warning" style={{ fontSize: '.65rem' }}>Admin</span>
+      )}
+    </div>
+  )
+}
 
 export default function CommunityDetail() {
   const { id } = useParams()
@@ -12,8 +41,10 @@ export default function CommunityDetail() {
   const [community, setCommunity] = useState(null)
   const [services, setServices] = useState([])
   const [companies, setCompanies] = useState([])
+  const [members, setMembers] = useState([])
   const [tab, setTab] = useState('services')
   const [loading, setLoading] = useState(true)
+  const [loadingMembers, setLoadingMembers] = useState(false)
 
   useEffect(() => {
     Promise.all([
@@ -26,6 +57,16 @@ export default function CommunityDetail() {
       setCompanies(co.docs)
     }).finally(() => setLoading(false))
   }, [id])
+
+  useEffect(() => {
+    if (tab !== 'members') return
+    if (members.length > 0) return
+    setLoadingMembers(true)
+    getCommunityMembers(id)
+      .then(setMembers)
+      .catch(() => toast.error('Erro ao carregar membros.'))
+      .finally(() => setLoadingMembers(false))
+  }, [tab, id])
 
   async function handleDelete() {
     if (!window.confirm(`Excluir a comunidade "${community.name}"? Esta ação não pode ser desfeita.`)) return
@@ -72,7 +113,7 @@ export default function CommunityDetail() {
         </div>
       </div>
 
-      {/* Add buttons */}
+      {/* Admin buttons */}
       {(isAdmin || (user && community.adminIds?.includes(user.uid))) && (
         <div style={{ display: 'flex', gap: '.75rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
           <Link to={`/comunidades/${id}/editar`} className="btn btn-outline btn-sm">
@@ -99,6 +140,9 @@ export default function CommunityDetail() {
         </button>
         <button className={`tab ${tab === 'companies' ? 'active' : ''}`} onClick={() => setTab('companies')}>
           Empresas ({companies.length})
+        </button>
+        <button className={`tab ${tab === 'members' ? 'active' : ''}`} onClick={() => setTab('members')}>
+          Membros ({community.memberCount || 0})
         </button>
       </div>
 
@@ -135,6 +179,18 @@ export default function CommunityDetail() {
                 </div>
               </Link>
             ))}
+          </div>
+        )
+      )}
+
+      {tab === 'members' && (
+        loadingMembers ? (
+          <div style={{ display: 'flex', justifyContent: 'center', padding: '3rem' }}><div className="spinner" /></div>
+        ) : members.length === 0 ? (
+          <div className="empty-state"><HiUser /><h3>Nenhum membro ainda</h3></div>
+        ) : (
+          <div className="grid-2">
+            {members.map(m => <MemberCard key={m.id} member={m} />)}
           </div>
         )
       )}
