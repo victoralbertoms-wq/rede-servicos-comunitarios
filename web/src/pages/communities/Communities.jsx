@@ -6,7 +6,7 @@ import toast from 'react-hot-toast'
 import { HiUserGroup, HiLockClosed, HiSearch, HiPlus } from 'react-icons/hi'
 
 function JoinModal({ community, onClose, onJoined }) {
-  const { user } = useAuth()
+  const { user, fetchUserProfile } = useAuth()
   const navigate = useNavigate()
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -15,12 +15,12 @@ function JoinModal({ community, onClose, onJoined }) {
     setLoading(true)
     try {
       await joinCommunity(community.id, user.uid, password)
+      await fetchUserProfile(user.uid)
       toast.success(`Você entrou em ${community.name}!`)
       onJoined()
       navigate(`/comunidades/${community.id}`)
     } catch (err) {
       toast.error(err.message || 'Erro ao entrar na comunidade.')
-    } finally {
       setLoading(false)
     }
   }

@@ -61,12 +61,17 @@ export async function joinCommunity(communityId, userId, password) {
   if (!community) throw new Error('Comunidade não encontrada')
   if (community.password && community.password !== password) throw new Error('Senha incorreta')
   const memberId = `${communityId}_${userId}`
+  const existing = await getDoc(doc(db, 'community_members', memberId))
+  if (existing.exists()) throw new Error('Você já é membro desta comunidade')
   await setDoc(doc(db, 'community_members', memberId), {
     communityId, userId, role: 'member',
     status: community.requireApproval ? 'pending' : 'approved',
     joinedAt: serverTimestamp(),
   })
-  await updateDoc(doc(db, 'communities', communityId), { memberCount: increment(1) })
+  await Promise.all([
+    updateDoc(doc(db, 'communities', communityId), { memberCount: increment(1) }),
+    updateDoc(doc(db, 'users', userId), { communities: arrayUnion(communityId) }),
+  ])
 }
 
 export async function getCommunityMembers(communityId) {
