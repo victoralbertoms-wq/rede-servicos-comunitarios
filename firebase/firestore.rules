@@ -98,5 +98,11 @@ service cloud.firestore {
       allow read: if isAuthenticated();
       allow write: if isAuthenticated();
     }
+
+    // ─── Curriculos ───────────────────────────────────────────────────────────
+    match /curriculos/{userId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && request.auth.uid == userId;
+    }
   }
 }

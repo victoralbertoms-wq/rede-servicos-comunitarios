@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { collection, query, where, getDocs } from 'firebase/firestore'
 import { db } from '../../firebase/config'
-import { getCommunity, getServices, getCompanies, deleteCommunity, getCommunityMembers } from '../../services/firestoreService'
+import { getCommunity, getServices, getCompanies, deleteCommunity, getCommunityMembers, getCurriculo } from '../../services/firestoreService'
 import { useAuth } from '../../contexts/AuthContext'
 import toast from 'react-hot-toast'
 import {
@@ -14,9 +14,12 @@ function MemberProfileModal({ member, onClose }) {
   const navigate = useNavigate()
   const user = member.user
   const name = user?.displayName || 'Usuário'
+  const [modalTab, setModalTab] = useState('servicos')
   const [services, setServices] = useState([])
   const [companies, setCompanies] = useState([])
+  const [curriculo, setCurriculo] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [loadingCurriculo, setLoadingCurriculo] = useState(false)
 
   useEffect(() => {
     async function load() {
@@ -30,6 +33,14 @@ function MemberProfileModal({ member, onClose }) {
     }
     load()
   }, [member.userId])
+
+  useEffect(() => {
+    if (modalTab !== 'curriculo' || curriculo !== null) return
+    setLoadingCurriculo(true)
+    getCurriculo(member.userId)
+      .then(data => setCurriculo(data || {}))
+      .finally(() => setLoadingCurriculo(false))
+  }, [modalTab, member.userId])
 
   function handleMessage() {
     onClose()
@@ -69,102 +80,167 @@ function MemberProfileModal({ member, onClose }) {
           </button>
         </div>
 
-        {/* Services & Companies */}
-        <div style={{ padding: '1rem 1.5rem 1.5rem', maxHeight: 360, overflowY: 'auto' }}>
-          {loading ? (
-            <div style={{ display: 'flex', justifyContent: 'center', padding: '2rem' }}><div className="spinner" /></div>
-          ) : (
-            <>
-              {/* Services */}
-              {services.length > 0 && (
-                <div style={{ marginBottom: '1.25rem' }}>
-                  <p style={{ fontWeight: 700, fontSize: '.8rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: '.6rem' }}>
-                    <HiBriefcase style={{ display: 'inline', marginRight: 4 }} />Serviços ({services.length})
-                  </p>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '.5rem' }}>
-                    {services.map(s => (
-                      <Link
-                        key={s.id}
-                        to={`/servicos/${s.id}`}
-                        onClick={onClose}
-                        style={{ textDecoration: 'none' }}
-                      >
-                        <div style={{
-                          padding: '.65rem .875rem', borderRadius: 'var(--radius)',
-                          border: '1px solid var(--border)', background: 'var(--surface)',
-                          display: 'flex', alignItems: 'center', gap: '.75rem',
-                        }}
-                          onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--primary)'}
-                          onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border)'}
-                        >
-                          <div style={{
-                            width: 36, height: 36, borderRadius: 8, flexShrink: 0,
-                            background: s.photoURL ? `url(${s.photoURL}) center/cover` : 'linear-gradient(135deg,var(--primary),var(--secondary))',
-                          }} />
-                          <div style={{ flex: 1, minWidth: 0 }}>
-                            <p style={{ fontWeight: 600, fontSize: '.88rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.name}</p>
-                            <p style={{ fontSize: '.75rem', color: 'var(--text-muted)' }}>{s.category} · {s.city}</p>
+        {/* Tabs */}
+        <div className="tabs" style={{ padding: '0 1.5rem', borderBottom: '1px solid var(--border)' }}>
+          <button className={`tab ${modalTab === 'servicos' ? 'active' : ''}`} onClick={() => setModalTab('servicos')} style={{ fontSize: '.82rem' }}>
+            Serviços & Empresas
+          </button>
+          <button className={`tab ${modalTab === 'curriculo' ? 'active' : ''}`} onClick={() => setModalTab('curriculo')} style={{ fontSize: '.82rem' }}>
+            Currículo
+          </button>
+        </div>
+
+        {/* Content */}
+        <div style={{ padding: '1rem 1.5rem 1.5rem', maxHeight: 340, overflowY: 'auto' }}>
+          {modalTab === 'servicos' && (
+            loading ? (
+              <div style={{ display: 'flex', justifyContent: 'center', padding: '2rem' }}><div className="spinner" /></div>
+            ) : (
+              <>
+                {services.length > 0 && (
+                  <div style={{ marginBottom: '1.25rem' }}>
+                    <p style={{ fontWeight: 700, fontSize: '.8rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: '.6rem' }}>
+                      <HiBriefcase style={{ display: 'inline', marginRight: 4 }} />Serviços ({services.length})
+                    </p>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '.5rem' }}>
+                      {services.map(s => (
+                        <Link key={s.id} to={`/servicos/${s.id}`} onClick={onClose} style={{ textDecoration: 'none' }}>
+                          <div style={{ padding: '.65rem .875rem', borderRadius: 'var(--radius)', border: '1px solid var(--border)', background: 'var(--surface)', display: 'flex', alignItems: 'center', gap: '.75rem' }}
+                            onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--primary)'}
+                            onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border)'}>
+                            <div style={{ width: 36, height: 36, borderRadius: 8, flexShrink: 0, background: s.photoURL ? `url(${s.photoURL}) center/cover` : 'linear-gradient(135deg,var(--primary),var(--secondary))' }} />
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <p style={{ fontWeight: 600, fontSize: '.88rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.name}</p>
+                              <p style={{ fontSize: '.75rem', color: 'var(--text-muted)' }}>{s.category} · {s.city}</p>
+                            </div>
+                            {s.rating > 0 && <span style={{ display: 'flex', alignItems: 'center', gap: '.2rem', fontSize: '.75rem', color: 'var(--accent)', flexShrink: 0 }}><HiStar /> {s.rating.toFixed(1)}</span>}
                           </div>
-                          {s.rating > 0 && (
-                            <span style={{ display: 'flex', alignItems: 'center', gap: '.2rem', fontSize: '.75rem', color: 'var(--accent)', flexShrink: 0 }}>
-                              <HiStar /> {s.rating.toFixed(1)}
-                            </span>
-                          )}
-                        </div>
-                      </Link>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {companies.length > 0 && (
+                  <div>
+                    <p style={{ fontWeight: 700, fontSize: '.8rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: '.6rem' }}>
+                      <HiOfficeBuilding style={{ display: 'inline', marginRight: 4 }} />Empresas ({companies.length})
+                    </p>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '.5rem' }}>
+                      {companies.map(c => (
+                        <Link key={c.id} to={`/empresas/${c.id}`} onClick={onClose} style={{ textDecoration: 'none' }}>
+                          <div style={{ padding: '.65rem .875rem', borderRadius: 'var(--radius)', border: '1px solid var(--border)', background: 'var(--surface)', display: 'flex', alignItems: 'center', gap: '.75rem' }}
+                            onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--secondary)'}
+                            onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border)'}>
+                            <div style={{ width: 36, height: 36, borderRadius: 8, flexShrink: 0, background: c.logoURL ? `url(${c.logoURL}) center/cover` : 'linear-gradient(135deg,var(--secondary),var(--success))' }} />
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <p style={{ fontWeight: 600, fontSize: '.88rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.name}</p>
+                              <p style={{ fontSize: '.75rem', color: 'var(--text-muted)' }}>{c.category}</p>
+                            </div>
+                            {c.rating > 0 && <span style={{ display: 'flex', alignItems: 'center', gap: '.2rem', fontSize: '.75rem', color: 'var(--accent)', flexShrink: 0 }}><HiStar /> {c.rating.toFixed(1)}</span>}
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {services.length === 0 && companies.length === 0 && (
+                  <p style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: '.88rem', padding: '1rem 0' }}>
+                    Este membro ainda não tem serviços ou empresas cadastrados.
+                  </p>
+                )}
+              </>
+            )
+          )}
+
+          {modalTab === 'curriculo' && (
+            loadingCurriculo ? (
+              <div style={{ display: 'flex', justifyContent: 'center', padding: '2rem' }}><div className="spinner" /></div>
+            ) : !curriculo || Object.keys(curriculo).filter(k => k !== 'updatedAt').length === 0 ? (
+              <p style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: '.88rem', padding: '1rem 0' }}>
+                Este membro ainda não preencheu o currículo.
+              </p>
+            ) : (
+              <div>
+                {curriculo.titulo && (
+                  <div style={{ marginBottom: '1rem' }}>
+                    <p style={{ fontWeight: 700, fontSize: '1rem' }}>{curriculo.titulo}</p>
+                    {curriculo.area && <p style={{ fontSize: '.82rem', color: 'var(--text-muted)' }}>{curriculo.area}</p>}
+                    {curriculo.disponibilidade && (
+                      <span style={{ display: 'inline-block', marginTop: '.35rem', fontSize: '.75rem', background: 'var(--success-alpha, rgba(34,197,94,.1))', color: 'var(--success)', padding: '2px 10px', borderRadius: 20 }}>
+                        {curriculo.disponibilidade}
+                      </span>
+                    )}
+                  </div>
+                )}
+
+                {curriculo.resumo && (
+                  <p style={{ fontSize: '.85rem', color: 'var(--text-muted)', lineHeight: 1.6, marginBottom: '1rem', paddingBottom: '1rem', borderBottom: '1px solid var(--border)' }}>{curriculo.resumo}</p>
+                )}
+
+                {curriculo.habilidades?.length > 0 && (
+                  <div style={{ marginBottom: '1rem', paddingBottom: '1rem', borderBottom: '1px solid var(--border)' }}>
+                    <p style={{ fontWeight: 700, fontSize: '.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: '.5rem' }}>Habilidades</p>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.35rem' }}>
+                      {curriculo.habilidades.map(h => (
+                        <span key={h} style={{ fontSize: '.75rem', background: 'var(--primary-alpha, rgba(79,70,229,.1))', color: 'var(--primary)', borderRadius: 20, padding: '2px 10px' }}>{h}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {curriculo.experiencias?.length > 0 && (
+                  <div style={{ marginBottom: '1rem', paddingBottom: '1rem', borderBottom: '1px solid var(--border)' }}>
+                    <p style={{ fontWeight: 700, fontSize: '.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: '.5rem' }}>Experiência</p>
+                    {curriculo.experiencias.map((e, i) => (
+                      <div key={i} style={{ marginBottom: '.625rem' }}>
+                        <p style={{ fontWeight: 600, fontSize: '.85rem' }}>{e.empresa}</p>
+                        <p style={{ fontSize: '.8rem', color: 'var(--text-muted)' }}>{e.cargo}</p>
+                        <p style={{ fontSize: '.72rem', color: 'var(--text-light)' }}>{e.inicio}{e.fim ? ` — ${e.fim}` : ''}</p>
+                        {e.descricao && <p style={{ fontSize: '.78rem', color: 'var(--text-muted)', marginTop: '.2rem' }}>{e.descricao}</p>}
+                      </div>
                     ))}
                   </div>
-                </div>
-              )}
+                )}
 
-              {/* Companies */}
-              {companies.length > 0 && (
-                <div>
-                  <p style={{ fontWeight: 700, fontSize: '.8rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: '.6rem' }}>
-                    <HiOfficeBuilding style={{ display: 'inline', marginRight: 4 }} />Empresas ({companies.length})
-                  </p>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '.5rem' }}>
-                    {companies.map(c => (
-                      <Link
-                        key={c.id}
-                        to={`/empresas/${c.id}`}
-                        onClick={onClose}
-                        style={{ textDecoration: 'none' }}
-                      >
-                        <div style={{
-                          padding: '.65rem .875rem', borderRadius: 'var(--radius)',
-                          border: '1px solid var(--border)', background: 'var(--surface)',
-                          display: 'flex', alignItems: 'center', gap: '.75rem',
-                        }}
-                          onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--secondary)'}
-                          onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border)'}
-                        >
-                          <div style={{
-                            width: 36, height: 36, borderRadius: 8, flexShrink: 0,
-                            background: c.logoURL ? `url(${c.logoURL}) center/cover` : 'linear-gradient(135deg,var(--secondary),var(--success))',
-                          }} />
-                          <div style={{ flex: 1, minWidth: 0 }}>
-                            <p style={{ fontWeight: 600, fontSize: '.88rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.name}</p>
-                            <p style={{ fontSize: '.75rem', color: 'var(--text-muted)' }}>{c.category}</p>
-                          </div>
-                          {c.rating > 0 && (
-                            <span style={{ display: 'flex', alignItems: 'center', gap: '.2rem', fontSize: '.75rem', color: 'var(--accent)', flexShrink: 0 }}>
-                              <HiStar /> {c.rating.toFixed(1)}
-                            </span>
-                          )}
-                        </div>
-                      </Link>
+                {curriculo.formacao?.length > 0 && (
+                  <div style={{ marginBottom: '1rem', paddingBottom: '1rem', borderBottom: '1px solid var(--border)' }}>
+                    <p style={{ fontWeight: 700, fontSize: '.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: '.5rem' }}>Formação</p>
+                    {curriculo.formacao.map((f, i) => (
+                      <div key={i} style={{ marginBottom: '.5rem' }}>
+                        <p style={{ fontWeight: 600, fontSize: '.85rem' }}>{f.instituicao}</p>
+                        <p style={{ fontSize: '.8rem', color: 'var(--text-muted)' }}>{f.curso}</p>
+                        <p style={{ fontSize: '.72rem', color: 'var(--text-light)' }}>{f.inicio}{f.fim ? ` — ${f.fim}` : ''}</p>
+                      </div>
                     ))}
                   </div>
-                </div>
-              )}
+                )}
 
-              {services.length === 0 && companies.length === 0 && (
-                <p style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: '.88rem', padding: '1rem 0' }}>
-                  Este membro ainda não tem serviços ou empresas cadastrados.
-                </p>
-              )}
-            </>
+                {curriculo.cursos?.length > 0 && (
+                  <div>
+                    <p style={{ fontWeight: 700, fontSize: '.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: '.5rem' }}>Cursos e Certificações</p>
+                    {curriculo.cursos.map((c, i) => (
+                      <div key={i} style={{ marginBottom: '.4rem', display: 'flex', justifyContent: 'space-between' }}>
+                        <div>
+                          <p style={{ fontWeight: 600, fontSize: '.82rem' }}>{c.nome}</p>
+                          <p style={{ fontSize: '.75rem', color: 'var(--text-muted)' }}>{c.instituicao}</p>
+                        </div>
+                        {c.ano && <p style={{ fontSize: '.72rem', color: 'var(--text-light)', flexShrink: 0 }}>{c.ano}</p>}
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {curriculo.linkedin && (
+                  <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--border)' }}>
+                    <a href={curriculo.linkedin.startsWith('http') ? curriculo.linkedin : `https://${curriculo.linkedin}`} target="_blank" rel="noopener noreferrer" style={{ fontSize: '.82rem', color: 'var(--primary)' }}>
+                      LinkedIn ↗
+                    </a>
+                  </div>
+                )}
+              </div>
+            )
           )}
         </div>
       </div>

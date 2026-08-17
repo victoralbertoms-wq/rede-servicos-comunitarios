@@ -1,7 +1,7 @@
 import {
   collection, doc, addDoc, setDoc, getDoc, getDocs, updateDoc, deleteDoc,
   query, where, orderBy, limit, startAfter, onSnapshot,
-  serverTimestamp, increment, arrayUnion, arrayRemove,
+  serverTimestamp, increment, arrayUnion, arrayRemove, writeBatch,
 } from 'firebase/firestore'
 import { db } from '../firebase/config'
 import { uploadToCloudinary } from '../utils/cloudinary'
@@ -90,6 +90,17 @@ export async function getCommunityMembers(communityId) {
 export async function getUser(uid) {
   const snap = await getDoc(doc(db, 'users', uid))
   return snap.exists() ? { id: snap.id, ...snap.data() } : null
+}
+
+// ── Curriculos ─────────────────────────────────────────────────────────────────
+
+export async function getCurriculo(userId) {
+  const snap = await getDoc(doc(db, 'curriculos', userId))
+  return snap.exists() ? snap.data() : null
+}
+
+export async function saveCurriculo(userId, data) {
+  await setDoc(doc(db, 'curriculos', userId), { ...data, updatedAt: serverTimestamp() }, { merge: true })
 }
 
 // ── Services ───────────────────────────────────────────────────────────────────
